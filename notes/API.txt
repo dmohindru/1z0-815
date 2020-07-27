@@ -1,0 +1,76 @@
+String
+-------
+- String constructors
+1. String() - The no-args constructor creates an empty String.
+2. String(String str), String(StringBuilder sb) - Create a new String by copying the sequence of characters currently contained in the passed String or StringBuilder objects.
+3. String(byte[] bytes) - Creates a new String by decoding the specified array of bytes using the platform's default charset.
+4. String(char[] value)- Creates a new String so that it represents the sequence of characters currently contained in the character array argument.
+
+- public String[] split​(String regex, int limit) 
+It returns the String[] after splitting this string around matches of the given regex.
+The limit parameter controls the number of times the pattern is applied and therefore affects the length of the resulting array. 
+If the limit is positive then the pattern will be applied at most (limit - 1) times
+If the limit is zero or less than zero then the pattern will be applied as many times as possible.
+Or in other words this split will return String array of max length limit if limit > 0.
+
+- public String[] split​(String regex) {...}: It returns the String[] after splitting this string around matches of the given regular expression.
+This method works as if by invoking the two-argument split method with the given expression and a limit argument of zero. Trailing empty strings are therefore not included in the resulting array. 
+
+"BAZAAR".split("A"); returns ["B","Z","","R"] as this statement is equivalent to "BAZAAR".split("A", 0);.
+
+":".split(":"); returns blank array as this statement is equivalent to ":".split(":", 0);.
+
+- int indexOf(String str) method of String class returns the index within this string of the first occurrence of the specified substring or -1 if not found. e.g. "Java".indexOf("a") returns 1.
+
+- int indexOf(int ch)- Returns the index within this string of the first occurrence of the specified character.  Returns -1 if the character is not found.
+
+- char charAt​(int index) method of String class returns the char value at the specified index. e.g. "Java".charAt(2) returns 'v'. If index is >= length of String then StringIndexOutOfBoundException is thrown.
+
+- isEmpty() method of String class returns true if and only if length() is 0.
+
+- isBlank() method of String class (available since Java 11) returns true if the string is empty or contains only white space codepoints, otherwise false.
+
+
+- String concat(String str) - Concatenates the specified string to the end of this string.
+Example - System.out.println("1234".concat("abcd")); //prints 1234abcd
+
+- int length() - Returns the length of this string.
+
+- String substring(int beginIndex, int endIndex) - Returns a new string that is a substring of this string. beginIndex (inclusive), endIndex(exclusive). If endIndex is > length of String then StringIndexOutOfBoundException is thrown.
+
+- String substring(int beginIndex) - This method works just like the other substring method except that it returns all the characters from beginIndex (i.e. including the character at the beginindex) to the end of the string (including the last character). If endBegin is > length of String then StringIndexOutOfBoundException is thrown.
+
+- String toLowerCase()/toUpperCase() - Converts all of the characters in this String to lower/upper case. 
+Example - System.out.println("ab".toUpperCase()); //prints AB
+
+- String replace(char oldChar, char newChar) - Returns a new string resulting from replacing all occurrences of oldChar in this string with newChar.
+Example: System.out.println("ababa".replace('a', 'c')); //prints cbcbc
+
+- String strip(), stripLeading(), stripTrailing(), trim() - Returns a copy of the string, with leading and/or trailing white space omitted.
+Example:
+System.out.println(" 123 ".strip()); //prints "123" (without the quotes)
+System.out.println(" 123 ".stripLeading()); //prints "123 " (without the quotes)
+System.out.println(" 123 ".stripTrailing()); //prints " 123" (without the quotes)
+System.out.println(" 123 ".trim()); //prints "123" (without the quotes)
+
+- One interesting thing about the String manipulation methods detailed above is that they return the same string if there is no change in the string as a result of the operation.
+
+- boolean startsWith(String prefix): Returns true if this string starts with the specified prefix.
+
+- boolean endsWith(String suffix): Returns true if this string ends with the specified suffix.
+
+- boolean contains(CharSequence s): Returns true if and only if this string contains the specified sequence of char values.
+
+- boolean equals(Object anObject): Returns true if the contents of this string and the passed string are exactly same. Observe that the type of the parameter is Object. That's because this method is actually defined in the Object class and the String class overrides this method. So, you can pass any object to this method, but if that object is not a string, it will return false.
+
+- boolean equalsIgnoreCase(String anotherString): Compares this String to another String, ignoring case considerations.
+
+  
+
+
+
+StringBuilder
+--------------
+
+- reverse() returns a StringBuilder object in reversed order and modifies original object
+- replace(int start, int end, String str) replaces StringBuilder object with str starting at start(inclusive) and ending at end(exclusive) and returns modified StringBuilder object.

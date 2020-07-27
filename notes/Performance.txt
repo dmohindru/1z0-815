@@ -1,0 +1,57 @@
+
+Topic					Test1	Test2	Test3	Test4	Test5	Test6
+------------------------------
+Understanding Java Technology 
+and environment (1 question)		0%	100%	--
+
+
+Creating a Simple Java Program
+(5 question)				0%	40%	100%
+
+
+Working With Java Primitive Data
+Types and String APIs
+(10 questions)				50%	40%	45%
+
+
+Using Operators and Decision 
+Constructs (12 questions)		75%	67%	64%
+
+
+Working with Java Arrays
+(6 questions)				33%	50%	71%
+
+
+Describing and Using Objects 
+and Classes (1 question)		100%	100%	100%
+
+
+Creating and Using Methods 
+(5 questions)				60%	80%	60%
+
+
+Applying Encapsulation 
+(2 questions)				100%	100%	0%
+
+
+Reusing Implementations Through
+Inheritance (6 questions)		29%	67%	86%
+
+
+Programming Abstractly Through 
+Interfaces (18 questions)		29%	56%	78%
+
+
+Handling Exceptions (8 questions)	25%	63%	25%
+
+
+Understanding Modules (8 questions)	38%	50%	50%
+
+---------------------------------------------------------------------------
+
+
+
+Overall Performance			41%	58%	63%
+
+
+

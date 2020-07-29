@@ -52,7 +52,14 @@ eg. byte b = (byte) 100000; would take eight bit value from 100000 and store in 
 
 - As String are immutable type. So if a String object is passed to a method with modifies that String object. Then the original String is not
 modified but a new String object is created. So if that method does not returns this modified String object then original String object is not modified
-and a newly created String object becomes eligible for garbage collection.   
+and a newly created String object becomes eligible for garbage collection.
+
+- You need to keep in mind an important point related to String Concatenation:
+If only one operand expression is of type String, then string conversion is performed on the other operand to produce a string at run time.
+If one of the operand is null, it is converted to the string "null".
+If operand is not null, then the conversion is performed as if by an invocation of the toString method of the referenced object with no arguments; but if the result of invoking the toString method is null, then the string "null" is used instead.
+
+- While concating an object with String, an objects toString() method is called.
 
 
 MAIN OBSERVATIONS
@@ -98,6 +105,25 @@ as variable name, method name, package name or loop label. But it cannot be used
 
 - For decision construct like in if, we can use wrapper Boolean class also.
 
+- if switch construct have default clause stated on top of other case clause and if no case statement is matched then default will be executed and fall
+through all case statement if no break statement is encountered in the path.
+
+- do while loop with continue statement.
+
+- Following statement results in a compile-time error:
+while (false) { x=3; }
+because the statement x=3; is not reachable; but the superficially similar case:
+if (false) { x=3; }
+does not result in a compile-time error. An optimizing compiler may realize that the statement x=3; will never be executed and may choose to omit the code for that statement from the generated class file, but the statement x=3; is not regarded as "unreachable" in the technical sense specified here.
+
+- statement -val returns negative value of val but does not modifies original value of val.
+
+- //Postfix operator has higher precedence than other available operators 
+e.g. -val-- would evaluate as -(val--) what this expression does it get the value of val, return its negated value and then decrement value of val by 1. So if val = 9, then above expression would return -9 and after evaluating this expression value of val is 8.
+e.g. -(++val) what this expression does it get the value of val, increment it by one and return its negated value. 
+So if val = 9, then above expression would return -10 and after evaluating this expression value of val is 10 
+
+
 MAIN OBSERVATIONS
 -----------------
 - silly mistakes
@@ -118,6 +144,42 @@ of compare method of their respective primitive types.
 - Declaration of type var variable_name = {1, 2, 3} also not allowed as Explicit target-type is needed for the
 array initializer. E.g. var variable_name = new int[]{1, 2, 3}
 
+- int [] arr1 = new int[8];` Creates one-dimensional array object to store 8 elements and arr1 refers to it. This statement compiles without any error.
+
+- int [][] arr2 = new int[8][8];` Creates two-dimensional array object to store 8 * 8 = 64 elements. This statement also compiles fine.
+
+- int [] arr3 [] = new int[8][];` Creates two-dimensional array object, whose 1st dimension is 8 but 2nd dimension is not yet defined. On the left side array symbols can be used before the reference variable or after the reference variable or can be mixed, hence int [][] arr3, int [] arr3 [] and int arr3[][] all are valid. This statement compiles successfully.
+
+- int arr4[][] = new int[][8];: 1st array dimension must be specified at the time of declaration. new int[][8]; causes compilation error as 1st dimension is not specified.
+
+- Legal ways to declare arrays
+One dimensional array
+int[] a, int a[]
+two dimensional array
+int[][] a, int[] a[], int a[][]
+
+- Legal ways of using array initalizers
+int[] ia = {1, 2, 3, 4, 5};
+int[] ia = new int[]{ 1, 2, 3, 4, 5 };
+int[] ia = new int[2]{ 1, 2 };//will not compile.
+
+Object[] obj = {new Object(), new Object()};
+Object[] obj = new Object[] {new Object(), new Object()};
+Object[] obj = new Object[2] {new Object(), new Object()}; //will not compile
+
+- Legal ways for using allocated and uninitalized array
+int[] ia = new int[2];
+Object[] obj = new Object[2];
+
+- Legal ways for using multi-dimentional array initalizer
+int[][] iaa = new int[2][3];
+int[][] iaa = new int[3][];
+int[][] iaa = new int[][]{ new int[]{ 1, 2 }, new int[]{ 3, 4 } }; is same as int[][] iaa = { { 1, 2 }, {3, 4 };
+Object[] obj[] =  { {"string is also an object"}, {null } , { new Object() , new Integer(10)} }; 
+ 
+- Be very observant about question asking you what options to choose so that program compiles only and not cause runtime exception. Or program that compiles
+and executes successfully. These two question would have different answers. 
+
 
 MAIN OBSERVATIONS
 -----------------
@@ -133,6 +195,15 @@ Describing and Using Objects and Classes (1 question) -- 100%
 Creating and Using Methods (5 questions) -- 80%
 -----------------------------------------------
 - non static member and methods cannot be accessed from static methods/static initializers
+
+- Class name and method name can be same and that is why given method can be declared in any of the given classes: emp, Emp, employee, Employee, Student and _emp_. _emp_ is also a valid Java identifier. Hence class name can start with _ character.
+
+- this(arguments); syntax is used to call one constructor from other constructor. 
+
+- variable in methods cannot be declared private or protected.
+
+- Method selection for overloaded message
+
 
 
 
@@ -194,6 +265,24 @@ ParentClass parentClass = new ParentClass() {
 - Static methods in Java are inherited, but can not be overridden. If you declare the same method in a subclass,
 you hide the superclass method instead of overriding it. Static methods are not polymorphic. At the compile time,
 the static method will be statically linked.
+
+- If a super class variable points to subclass variable then it is legal to cast super class variable to sub class variable, although it is redundant.
+eg. X --> Y --> Z
+X x = new Z();
+(Y)x; // legal and will compile even though its redundant
+(Z)x; // legal and will compile even though its redundant
+
+- ClassCastException is thrown if two super class variable point to sibling child classes if one sibling object is converted to other sibling object using a
+super class variable then ClassCastException is thrown.
+eg. A-->B, A-->C
+A a1 = new B();
+A a2 = new C();
+C c1 = (A)a1; // will compile fine but will throw ClassCastException.
+
+- private or protected modifier cannot be used at class level
+
+- Even though class is declared public but if its constructor is declared with default modifier (package private) we will not be able to inherit from that
+class in other package or even instantiate that class.
 
 
 Programming Abstractly Through Interfaces (18 questions) -- 56%
@@ -374,4 +463,4 @@ unnamed package is not allowed in named modules (see question 35)
 
 Current read
 ------------
-Creating a Simple Java Program (5 questions)
+Programming Abstractly Through Interfaces

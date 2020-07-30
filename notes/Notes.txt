@@ -61,6 +61,8 @@ If operand is not null, then the conversion is performed as if by an invocation 
 
 - While concating an object with String, an objects toString() method is called.
 
+- String class implements CharSequence. Hence reference variable of type CharSequence can point to String objects.
+
 
 MAIN OBSERVATIONS
 -----------------
@@ -203,6 +205,38 @@ Creating and Using Methods (5 questions) -- 80%
 - variable in methods cannot be declared private or protected.
 
 - Method selection for overloaded message
+1. The first rule is that having overloaded methods does not cause a compilation error by itself. In other words, as long as their method signatures are different, the compiler doesn't care whether they are too similar or not. Compilation error occurs only if the compiler is not able to successfully disambiguate a particular method call.
+
+2. Exact match - If the compiler finds a method whose parameter list is an exact match to the argument list of the method call, then it selects that method. For example, consider the following two methods: 
+void processData(Object obj){ }
+void processData(String str){ } 
+and the method call processData("hello");. Since String is an Object, the String argument matches the parameter list of both the methods and so both the methods are capable of accepting the method call. However, String is an exact match to the argument and so the compiler will select the second method. 
+This rule applies to primitives as well. Thus, out of the following two methods, the first method is selected when you call processData(10); because 10 is an int, which matches exactly to the parameter type of the first method even though the long version of the method is also perfectly capable of accepting the value. 
+void processData(int value){ }
+void processData(long value){ } 
+
+3. Most specific method - If more than one method is capable of accepting a method call and none of them is an exact match, the one that is "most specific" is chosen by the compiler. For example, consider the following two methods: 
+void processData(Object obj){ }
+void processData(CharSequence str){ } 
+and the method call processData("hello");. Remember that String extends CharSequence and CharSequence extends Object. Thus, a String is a CharSequence and a String is also an Object. So here, neither of the methods has a parameter list that is an exact match to the type of the argument but both the methods are capable of accepting a String. However, between Object and ChareSequence, CharSequence is more specific and so the compiler will select the second method.
+
+Since primitives are not classes, there is no subclass/superclass kind of relation between them as such but Java does define the subtype relation for them explicitly, which is as follows: 
+double > float > long > int > char 
+and 
+int > short > byte 
+What it means is, float is a subtype of double, long is a subtype of float, int is a subtype of long, and char is subtype of int. And also, short is a subtype of int and byte is a subtype of short. Based on the above, you can easily determine which of the following two methods will be picked if you call processData((byte) 10);
+void processData(int value){ }
+void processData(short value){ } 
+The short version will be picked because short is a subtype of int and is therefore, more specific than an int.
+
+4. Consider widening before autoboxing - Since autoboxing only came into existence when Java 5 was released, it is necessary to give higher priority to the primitive versions if the argument can be widened to the method parameter type so that existing code will keep working as before. Therefore, out of the following two methods, the short version will be picked instead of the Byte version if you call processData( (byte) b); even though the Byte version is an exact match with byte after autoboxing.
+void processData(short value){ }
+void processData(Byte value){ } 
+
+5. Consider autoboxing before varargs - This rule mandates that if an argument can be autoboxed into a method parameter type then that method be considered even if a method with varargs of the same type is available. This explains why if you call processData(10); then the Integer version (and not the int... version) is picked out of the following two. 
+void processData(int... values){ }
+void processData(Integer value){ }  
+
 
 
 
@@ -215,6 +249,7 @@ default (no access modifier specified with is package-private), protected, publi
 
 - if java file contains non public class and public class it will compile successfully. But non public class will
 only be visible in its package only while public class is access anywhere (verify it).
+
 
 Reusing Implementations Through Inheritance (6 questions) -- 67%
 ----------------------------------------------------------------
@@ -230,6 +265,10 @@ cast gc object to first Child and then to Parent object. Then Parent class quote
 - Access modifier of overriding method should either be same as the access modifier of overridden method or it should
 be less restrictive than the access modifier of overridden method.
 
+- An overriding method cannot put a wider exception (i.e. a superclass exception) in its throws clause than the ones present in the throws clause of the overridden method. For example, if the overridden method throws IOException, the overriding method cannot throw Exception because Exception is a superclass of IOException. 
+
+- In a sub class you cannot override a static method as instance method or instance method as static method.
+
 - protected member variables can only be accessed in subclass using using inheritance but not using object reference
 variable if a sub class is defined in different package. If sub class is defined in same package then protected, default
 access modifier variable can be access via inheritance as well as through object reference.
@@ -237,6 +276,10 @@ access modifier variable can be access via inheritance as well as through object
 - member variable inherited from super class can be access with this or super keyword.
 
 - Constructors cannot use final, abstract or static modifiers
+
+- abstract methods cannot be private, final and static
+
+- Using static and final in methods are redundant. When a static method is overridden in a subclass it can still be accessed via the super class, making a final declaration not very necessary. Declaring a static method final does prevent subclasses from defining a static method with the same signature.
 
 - sub class object is an instance of super class. Hence childClassObject instanceof Superclass returns true. But other
 way round super class in not an instance of child class.
@@ -284,9 +327,125 @@ C c1 = (A)a1; // will compile fine but will throw ClassCastException.
 - Even though class is declared public but if its constructor is declared with default modifier (package private) we will not be able to inherit from that
 class in other package or even instantiate that class.
 
+- Order of initalizers summarized
+A --> B (B is sub class of A)
+1. static initializers of A and B are invoked before B's main() is executed because the JVM needs to load the class before it can invoke a method on it.
+2. Static initializers of A and B are invoked only once even though two objects of B are created.
+3. Instance initializer of A is executed before A's constructor even though the instance initializer appears after the constructor in A's code.
+4. While creating an object of B, A's instance initializer and constructor are invoked before B's instance initializer and constructor.
+5. Instance initializer and constructor of A are invoked each time an object of B is created.
+
+- Summary of the application of access modifiers, final, abstract, and static keywords
+1. An abstract class doesn't necessarily have to have an abstract method but if a class has an abstract method, it must be declared abstract. In other words, a concrete class cannot have an abstract method.
+2. An abstract class cannot be instantiated irrespective of whether it has an abstract method or not.
+3. A final class or a final method cannot be abstract.
+4. A final class cannot contain an abstract method but an abstract class may contain a final method.
+5. A private method is always final. 
+6. A private method can never be abstract.
+7. A static method can be final but can never be abstract.
+
+- you can cast any type of reference to any interface. That's true except in one case. If the declared class of the variable is final and if that class does not implement the interface given in the cast, the compiler knows that this class can never have any subclass and therefore, it knows that there is no way the reference can point to an object of a class that extends this class and also implements the given interface. For example, String is a final class and the following code will not compile for the same reason: 
+String s = new String();
+Poisonous p = (Poisonous) s; //will not compile
+But you cannot cast unrelated class objects to each other.
+StringBuilder sb = (StringBuilder) new String("Hello World!); // will not compile
+
+- You need casting when you want to use the features (i.e. instance variables and methods) defined in a subclass using a reference whose declared type is of a superclass.
+
+-  static methods, static variables, and instance variables are accessed as per the declared type of the variable through which they are accessed and not according to the actual type of the object to which the variable refers. 
+
+- There are different ways in which static method of an abstract class can be accessed:
+(Abstract class) A --> MyClass
+1. By using the name of the abstract class: A.log(); //Preferred way
+2. By using the reference variable of abstract class: A o1 = null; o1.log();
+3. By using the name of the subclass: MyClass.log();
+4. By using the reference variable of the subclass: MyClass o2 = null; o2.log();
+
 
 Programming Abstractly Through Interfaces (18 questions) -- 56%
 ---------------------------------------------------------------
+- Interface abstract methods are always public and implicitly method. You don't have to specify abstract keyword.
+
+- Interface fields cannot be protected or private. All variables defined in an interface are implicitly public, static, and final. 
+
+- default methods are just the opposite of abstract methods. They are defined using the keyword default. Default methods are always public even if you do not declare them as such explicitly. You cannot mark them private or protected. default methods are part of object (Class instance)
+
+- static methods - As the name implies, static methods belong to the interface itself and not to the object implementing that interface. They are defined using the keyword static. Static methods can be marked public or private but not protected. If no access modifier is specified, they are implicitly public. Static methods cannot be marked default either. static methods are not inherited but always remain part of interface only.
+
+- Static methods of interface can only be invoked only as InterfaceName.nameOfStaticMethod(); and not by instance of class implementing the interface.
+
+- Private methods (static as well as no-static) have been allowed since Java 9 and, as explained above, they are helpful when a default and static methods gets too big and needs to be refactored into smaller internal methods without exposing the internal methods to the outside world.
+
+- Since methods of an interface are meant to be implemented by the classes that implement the interface, methods of an interface cannot be declared final.
+
+- methods in interface are by default abstract and abstract method cannot have a body. If we need to provide a
+method with implementation, we need to declare that method with default or private keyword and
+provide an implementation.
+
+- Syntax of class implementing multiple interfaces as class MyClass implements Interface1, Interface2 {}
+
+- it is possible for a class to inherit multiple implementations of a default method from more than one interface.  JVM will have ambiguity which method to invoke on than object. So Java resolves this problem by forcing the class to provide an implementation of the method of its own to remove the ambiguity in invocation.  
+
+- above rule also valid if one interface have default method and other has abstract method with same signature.
+
+- In Interfaces Java allows a class to inherit multiple fields with the same name as long as you don't try to use those fields ambiguously. To remove ambiguity use fields with their Interface name. e.g. Interface1.myVar and Interface2.myVar
+
+- Syntax for interface to extend interface
+single interface: Interface Interface2 extends Interface1 {}
+multiple interface: Interface Interface3 extends Interface1, Interface2, OtherInterface {}
+
+- Remember that a class cannot extend an interface, it can only implement an interface. Whereas, an interface cannot implement any interface it can only extend an interface. 
+
+- If an interface inherit two default methods or one abstract and other default method with same signature, then the inheriting interface should provide its own implementation of default method (like than in class) else it will be a compile error.
+
+- If two or more super interfaces have abstract method with same name, so inheriting interface will get only one copy of abstract method and hence class implementing that interface will have to provide only one implementation of that abstract method. 
+
+- Static fields of an interface are inherited by a sub interface and therefore ReadWritable does get two versions of SIZE variable. Java allows an interface to inherit multiple fields with the same name as long as you don't try to use those fields ambiguously. 
+  
+- Inheriting interface can provide implementation of abstract methods inherited from its super interface.
+
+- Since, due to type erasure, generic information is removed at run time, it follows that generic information cannot be a part of the signature. Thus, two methods that differ only in their type parameters are not valid overloads.
+
+- Read about writing generic class
+
+- Read about writing generic methods	
+
+- Generics were added quite late to Java (only in 1.5) and so backward compatibility was an important concern. Furthermore, since it was a fairly complicated feature, it was expected that their wide spread usage will take some time. Thus, it was deemed necessary that code that uses Generics must work with code that doesn't use Generics. To achieve this design goal, the mechanism of type erasure was used, where all the generic information is stripped from a class at run time. Thus, even if you write ArrayList<String> al = new ArrayList<>(); in your code, the JVM will only see ArrayList al = new ArrayList();. The type information is effectively "erased" from a class for the JVM.
+
+- Since, due to type erasure, generic information is removed at run time, it follows that generic information cannot be a part of the signature. Thus, two methods that differ only in their type parameters are not valid overloads.
+
+- Even though due to erasure, generic information is removed at run, this would result of valid override even if types are different. But java will not allow a code to compile if type information are different in overriding methods. In other word for a valid overriding methods should have same type for generic parameters.
+eg.
+class A { void processData(List<String> data){}}
+class B extends A { void processData(List<Integer> data){}} is an invalid override
+but
+class A { void processData(List<String> data){}}
+class B extends A { void processData(List<String> data){}} is an valid override
+
+- hierarchy of Collections interfaces and classes that you will see on the exam.
+> Collection
+> List
+> ArrayList
+
+- It declares only the methods that are applicable to all sorts of collections and leaves the methods that deal with specialized features such as ordering or uniqueness of elements to sub-interfaces such as List and Set. For example, Collection declares add(Object e) and remove(Object e) methods but does not declare add(int index, Object e) and remove(int index) because the concept of ordering is not applicable to all collections. We use the Collection interface when we don't want to make any assumption about the characteristics of the group of objects. In other words, if we get a Collection object, all we know is that it contains a bunch of elements.
+
+- Advantages of ArrayList ☝
+1. Dynamic sizing - An ArrayList can grow in size as required. The programmer doesn't have to worry about the length of the ArrayList while adding elements to it.
+2. Type safety - An ArrayList can be made type safe using generics.
+3. Readymade features - ArrayList provides methods for searching and for inserting elements anywhere in the list.
+
+- Disadvantages of ArrayList ☝
+1. Higher memory usage - An ArrayList generally requires more space than is necessary to hold the same number of elements in an array.
+2. No type safety - Without generics, an ArrayList is not type safe at all.
+3. No support for primitive values - ArrayLists cannot store primitive values while arrays can. This disadvantage has been mitigated somewhat with the introduction of autoboxing in Java 5, which makes it is possible to pass primitive values to various methods of an ArrayList. However, autoboxing does impact performance.
+
+Similarities between ArrayLists and arrays ☝
+1. Ordering - Both maintain the order of their elements.
+2. Duplicates - Both allow duplicate elements to be stored.
+3. nulls - Both allows nulls to be stored.
+4. Performance - Since an ArrayList is backed by an array internally, there is no difference in performance of various operations such as searching on an ArrayList and on an array.
+5. Thread safety - Neither of them are thread safe. Don't worry, thread safety is not on the exam, but you should be aware of the fact that accessing either of them from multiple threads, may produce incorrect results in certain situations.
+ 
 - Arrays.asList method returns a fixed-size list backed by the specified array and as list is backed by the specified
 array therefore, you cannot add or remove elements from this list. Using add/remove methods cause an
 exception at runtime. But you can invoke the set(int index, E element) method on the returned list.
@@ -304,9 +463,7 @@ passed.
 
 - abstract class in java can have 0 or more abstract methods
 
-- methods in interface are by default abstract and abstract method cannot have a body. If we need to provide a
-method with implementation, we need to declare that method with default or private keyword and
-provide an implementation.
+
 
 -clone method of list interface create a shallow copy of list object. Means if an original list contains reference
 variables then after clone method a new list object is created which contains same reference objects as original
@@ -321,10 +478,11 @@ required.
 Interface methods are public implicitly, so class which implements interface should also declare methods as public.
 
 - Study ques40 for a very peculiar example of sub class implementing interface and extending base class which does not
-implements any interface but has a same method implemented as its member method.
+implements any interface but has a same method implemented as its member method (Test 2).
 
 - Functional Interface can have only one non-overriding abstract method. Apart from it a functional interface can have
-constant variables, default methods, private methods, overriding abstract methods.
+constant variables, default methods, private methods, overriding abstract methods like public String toString(), public boolean equals(Object)
+and public int hashCode().
 
 - While traversing a list using an iterator, if it is required to remove item from list use Iterator.remove or
 ListIterator.remove method, rather than List.remove method. As later method will throw
@@ -340,6 +498,8 @@ syntax InterfaceName.variableName. But reference type can also point to interfac
 - add(E e) method of list return true if object was added successfully or false otherwise.
 - add(int index, E element) inserts element at index. It returns void. if index is < 0 or > list length, then
 IndexOutOfBound exception is thrown.
+
+
 
 
 MAIN OBSERVATIONS
@@ -463,4 +623,4 @@ unnamed package is not allowed in named modules (see question 35)
 
 Current read
 ------------
-Programming Abstractly Through Interfaces
+Programming Abstractly Through Interfaces - Ques 80

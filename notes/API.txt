@@ -154,6 +154,151 @@ of compare method of their respective primitive types.
 
 - public method named clone. This method creates a copy of the array object. Note that it doesn't create copies of the objects referred to by the array elements. It merely creates a new array object of the same length and copies the contents of existing array into the new array. Which means, if the existing array contained primitive values, those values will be copied to the elements of the new array. If the existing array contained references to objects, those references will be copied to the elements of the new array. Thus, the elements of the new array will also point to the same objects. This is also known as "shallow copy".
 
+- public static <T> List<T> asList(T... a)
+Returns a fixed-size list backed by the specified array. (Changes to the returned list "write through" to the array.) This method acts as bridge between array-based and collection-based APIs, in combination with Collection.toArray(). The returned list is serializable and implements RandomAccess.
+This method also provides a convenient way to create a fixed-size list initialized to contain several elements:
+     List<String> stooges = Arrays.asList("Larry", "Moe", "Curly");
+Parameters:
+a - the array by which the list will be backed
+Returns:
+a list view of the specified array
 
 
+Collection
+----------
+- add
 
+- addAll
+
+- remove
+
+- removeAll
+
+- removeIf (Predicate) method was added as a default method in Collection interface in JDK 8 and it removes all the elements of this collection that satisfy the given predicate.
+
+- contains
+
+- containsAll
+
+- isEmpty
+
+- clear
+
+
+List Interface
+--------------
+- E get(int index): Returns the element at index.
+
+- E set(int index, E e): Replaces the existing element at index with the passed object and returns the original element that was replaced.
+
+- boolean add(E e): Adds an object at the end of the list. Returns true.
+
+- void add(int index, E e): Adds an object at the specified index and shifts the existing elements at a higher index to the right.
+
+- boolean addAll(Collection<? extends E> c): Adds all the elements of the given collection to this list at the end. Returns true if this list changed as a result of the call.
+
+- void addAll(int index, Collection<? extends E> c): Adds all the elements of the given collection at the given index. Returns true if this list changed as a result of the call.
+
+- E remove(int index): Removes an object from the specified index and shifts the existing elements at a higher index to the left. It returns the original element that was removed from the list.
+
+- boolean remove(Object obj): Removes the first occurrence of given object from the list. Returns true if the object was found. The passed object is matched with the objects in the list using the equals method.
+
+- boolean removeAll(Collection<?> c): Removes from this list all the elements that are present in the passed collection. Returns true if this list changed as a result of the call.
+
+- boolean retainAll(Collection c): Removes from this list all the elements that are not in the passed collection. Returns true if this list changed as a result of the call.
+
+- void clear(): Removes all the elements from this list.
+
+- int size(): Returns the number of elements in this list.
+
+- default void forEach(Consumer<? super T> action): Inherited from java.lang.Iterable. Performs the given action for each element of the Iterable until all elements have been processed or the action throws an exception.
+
+- Remember that for the get and the remove methods, the index must be between 0 and the list's size1 minus 1 (both inclusive) otherwise an IndexOutOfBoundsException is thrown but in the case of the add method, the highest index value is the same as the list's size, which implies that you are adding an element after the last element, i.e., at the end of the list. 
+
+Methods that help you inspect a list:
+
+- boolean isEmpty(): Returns true if the list has no elements.
+
+- boolean contains(Object o): Returns true of the list contains the given object.
+
+- boolean containsAll(Collection c): Returns true of the list contains all of the elements present in the given collection.
+
+- List subList(int fromIndex, int toIndex): Returns a view of the portion of this list between the specified fromIndex, inclusive, and toIndex, exclusive. If fromIndex and toIndex are equal, the returned list is empty.
+
+- int indexOf(Object o): Returns the index at which the given object is found in the list. Returns -1 if it is not found.
+
+- int lastIndexOf(Object o): Returns the last index at which the given object is found in the list. Returns -1 if it is not found.
+
+- Object[] toArray(): Returns a array of Objects containing all the elements of this list.
+
+- <T> T[] toArray(T[] a): Returns an array of the type specified in the argument containing all the elements of this list. The objects of the list must be of the type passed in the argument. This method is helpful when you want to convert a list into an array of a specific type. For example, String[] strArray = listOfString.toArray(new String[0]); will return a String[] containing all the elements of the list.
+
+- The subList(int fromIndex, int toIndex) method in the above list of methods is particularly interesting. It does not return a new independent list but just a view into the original list. Thus, any change you do to the view is reflected in the original list as shown the example below: 
+
+- remove(Object o) method of list return true if object was removed successfully or false otherwise.
+
+- The overloaded of methods are merely convenience methods that take 0 to 10 parameters and return an unmodifiable List. For example, if you want to create a list of 3 Strings, you could do List<String> list1 = List.of("a", "b", "c");
+
+- copyOf method is a convenience method to create an unmodifiable list using the elements of an existing collection. For example, List<String> list2 = List.copyOf(list1);
+
+- of and copyOf methods are
+1. They are unmodifiable. Elements cannot be added, removed, or replaced. Calling any mutator method on the List will always cause UnsupportedOperationException to be thrown. However, if the contained elements are themselves mutable, this may cause the List's contents to appear to change.
+
+2. They disallow null elements. Attempts to create them with null elements result in NullPointerException.
+
+3. They are serializable if all elements are serializable. (Not important for the Part 1 exam)
+
+4. The order of elements in the list is the same as the order of the provided arguments, or of the elements in the provided array.
+
+5. They are value-based. Callers should make no assumptions about the identity of the returned instances. Factories are free to create new instances or reuse existing ones. Therefore, identity-sensitive operations on these instances (reference equality (==), identity hash code, and synchronization) are unreliable and should be avoided.
+
+ArrayList
+----------
+- ArrayList Constructors
+ArrayList(): Constructs an empty list with an initial capacity of 10. 
+ArrayList(Collection c): Constructs a list containing the elements of the specified collection. 
+ArrayList(int initialCapacity): Constructs an empty list with the specified initial capacity.
+
+- ensureCapacity(int n) .Calling this method with an appropriate number before inserting a large number of elements in the ArrayList improves performance of the add operation by reducing the need for incremental reallocation of the internal array.
+
+- trimToSize() method, which gets rid of all the unused space by reducing its capacity to the match the number of elements in the list.
+
+- String toString(): Well, toString is not really the most important method of ArrayList but since we will be depending on its output in our examples, it is better to know about it anyway. ArrayList's toString first gets a string representation for each of its elements (by invoking toString on them) and then combines into a single string that starts with [ and ends with ].
+
+- boolean add(E e): Appends the specified element to the end of this list. As discussed in the Generics section, E is just a place holder for whichever type you specify while creating the ArrayList. This method is actually declared in Collection interface and the return value is used to convey whether the collection was changed as a result of calling this method. In case of an ArrayList, the add method always adds the given element to the list (even if the element is null), which means it changes the collection every time it is invoked. Therefore, it always returns true. 
+
+- void add(int index, E element): Inserts the specified element at the specified position in this list. The indexing starts from 0 and the maximum value of index can be size. Therefore, if you call add(0, "hello") on an list of Strings, "hello" will be inserted at the first position. If index is greater than size of list, then IndexOutOfBoundException is thrown.
+
+- boolean addAll(Collection<? extends E> c): Appends all of the elements in the specified collection to the end of this list, in the order that they are returned by the specified collection's Iterator. 
+
+- boolean addAll(int index, Collection<? extends E> c): This method is similar to the one above except that it inserts the elements of the passed list in the specified collection into this list, starting at the specified position.
+
+- E remove(int index): Removes the element at the specified position in this list. If you pass an invalid int value as an argument (such as a negative value or a value that is beyond the range of the list, i.e., size-1), an IndexOutOfBoundsException will be thrown.
+
+- boolean remove(Object o): Removes the first occurrence of the specified element from this list, if it is present. This method returns true if an element was actually removed from the list as a result of this call. In other words, if there is no element in the list that matches the argument, the method will return false.
+
+- Removes from this list all of its elements that are contained in the specified collection. Unlike the remove(Object obj) method, which removes only the first occurrence of an element, removeAll removes all occurrences of an element.
+
+- void clear(): Removes all of the elements from this list. 
+
+- E set(int index, E element): Replaces the element at the specified position in this list with the specified element. It returns the element that was replaced. 
+
+- boolean contains(Object o): The object passed in the argument is compared with each element in the list using the equals method. A true is returned as soon as a matches is found, a false is returned otherwise. 
+
+- E get(int index): Returns the element at the specified position in this list. It throws an IndexOutOfBoundsException if an invalid value (i.e. a value less than 0 or greater than size-1) is passed as an argument.
+
+- int indexOf(Object o): The object passed in the argument is compared with each element in the list using the equals method. The index of the first element that matches is returned. If this list does not contain a matching element, -1 is returned.
+
+- boolean isEmpty(): Returns true if this list contains no elements.
+
+- int size(): Returns the number of elements in this list. Recall that to get the number of elements in a simple array, you use the variable named length of that array.
+
+- Here are a few points that you should remember for the exam:
+
+1. Adding nulls: ArrayList supports null elements.
+2. Adding duplicates: ArrayList supports duplicate elements.
+3. Exceptions: None of the ArrayList methods except toArray(T[] a) throw NullPointerException. They throw IndexOutOfBoundsException if you try to access an element beyond the range of the list.
+4. Method chaining: Unlike StringBuilder, none of the ArrayList methods return a reference to the same ArrayList object. Therefore, it is not possible to chain method calls.
+
+- Size vs Capacity
+Size is the number of elements that are currently stored in the ArrayList. While capacity is the length of the internal array that an ArrayList uses to store its elements.

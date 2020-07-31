@@ -361,6 +361,12 @@ StringBuilder sb = (StringBuilder) new String("Hello World!); // will not compil
 3. By using the name of the subclass: MyClass.log();
 4. By using the reference variable of the subclass: MyClass o2 = null; o2.log();
 
+- when instanceof is used on unrelated classes its causes compilation error. The compiler will let you use instanceof operator only if it is possible for the variable to refer to an object of the type given on the right-hand side. For example, f instanceof Mango is valid because the compiler knows that the declared type of f is Fruit and since Mango is a Fruit, it is possible for f to point to a Mango. But f instanceof String will not compile because the compiler knows that there is no way f can ever point to a String.
+
+- An abstract child sub class can declare overriding method of super class as abstract.
+
+- Child class can extend a concrete class and still be declared abstract.  
+
 
 Programming Abstractly Through Interfaces (18 questions) -- 56%
 ---------------------------------------------------------------
@@ -510,6 +516,19 @@ MAIN OBSERVATIONS
 Handling Exceptions (8 questions) -- 63%
 ----------------------------------------
 
+- A function can declare to throw any exception(s) with throws clause. e.g public void copyFile(String inputPath, String outputPath) throws IOException{}
+
+- A method can throw multiple type of exception with following syntax void method() throws IOException, SQLException, FileNotFoundException{}
+
+- Calling method can deal with called method throwing exception in two ways.
+1. By handling exception in try/catch block
+2. By declaring throws clause in method declaration. 
+
+- Method can use throw keyword to throw any exception from method body.
+
+- Note that curly braces for the try, catch, and finally blocks are required even if there is a single statement in these blocks  (compare that to if, while, do/while and for blocks where curly braces are not required if there is only one statement in the block).  Furthermore, a try block must follow with at least one catch block or the finally block. A try block that follows with neither a catch block nor a finally block will not compile. 
+ 
+
 - In exception handling order in which catch block is specified matter. if subclass exception is specified after super
 class exception, then it will be a compile error.
 
@@ -528,8 +547,30 @@ even though an executed catch block throws new other type of exception. And as u
 exception. But if method throws checked exception then calling method needs to handle that exception by either
 try/catch block or add throws clause to method signature.
 
+- Casting Super class Exceptions like RuntimeException to sub class exception like ArithmeticException will cause ClassCastException to be thrown.
+
 - Hierarchy of Exception framework
 java.lang.Throwable (Root of all exception classes, is covered under checked exception)
+
+- An overriding method can only throw Checked exception and its sub type if and only if super class overridden method declared it throws checked exception.
+
+- For instance if super class method throws IOException, so its legal for sub class to override a method with FileNotFoundException. But if super class overridden method is called in sub class overriding method, using super keyword then it will cause a compilation error as super class method throws a wider exception (IOException) and sub class throws only narrower exception (FileNotFoundException), which is illegal in java. Same rationale can be used in try catch block also, if try block throws wider exception and catch block only have narrower exception, it will be a compilation error. 
+
+- An overriding method can throw unchecked exception even if its super class method does not throws any exception.
+
+- Overriding method can choose not to throw any checked exception or throw any unchecked exception even if its super class overridden method throws checked exception. The other way rule applies to sub class overriding method.
+
+- multi catch syntax: catch (Exception1 | Exception2 ex) {}. But Exception1 and Exception2 must be unrelated exception i.e. they should not have any is-a relationship.
+
+- According to overriding rules, if super class / interface method declares to throw a checked exception, then overriding method of sub class / implementer class has following options:
+1. May not declare to throw any checked exception.
+2. May declare to throw the same checked exception thrown by super class / interface method.
+3. May declare to throw the sub class of the exception thrown by super class / interface method.
+4. Cannot declare to throw the super class of the exception thrown by super class / interface method.
+5. Cannot declare to throw unrelated checked exception.
+6. May declare to throw any RuntimeException or Error.
+
+- Java follows a convention in naming exception classes. This convention is sometimes helpful in determining the kind of exception you are dealing with. The name of any class that extends Error ends with Error and the name of any class than extends Exception ends with Exception. For example, OutOfMemoryError and StackOverflowError are Errors while IOException, SecurityException, IndexOutOfBoundsException are Exceptions. However, there is no way to distinguish between unchecked exceptions that extend RuntimeException and checked exceptions just by looking at their names. It is therefore, important to memorize the names of a few important runtime exception classes, namely - NullPointerException, ArrayIndexOutOfBoundsException, ArithmeticException, ClassCastException, and SecurityException.
 
 Checked Exceptions
 ------------------
@@ -552,6 +593,112 @@ some subclasses
 > java.lang.ArrayIndexOutOfBoundsException
 > java.lang.ArithmeticException
 > java.lang.ClassCastException
+
+
+- Common Exceptions that are usually thrown by the JVM
+1. ArithmeticException extends RuntimeException. The JVM throws this exception when you try to divide a number by zero.
+2. ClassCastException extends RuntimeException. The JVM throws this exception when you try to cast a reference variable to a type that fails the IS-A test.
+3. IndexOutOfBoundsException extends RuntimeException. This exception is a common superclass of exceptions that are thrown where an invalid index is used to access a value that supports indexed access. For example, the JVM throws its subclass ArrayIndexOutOfBoundsException when you attempt to access an array with an invalid index value such as a negative value or a value that is greater than the length (minus one, of course) of the array. Methods of String class throw another of its subclass StringIndexOutOfBoundsException when you try to access a character at an invalid index.
+4. NullPointerException extends RuntimeException 
+The JVM throws this exception when you attempt to call a method or access a field using a reference variable that is pointing to null. 
+
+
+- Common Errors usually thrown by the JVM
+1. ExceptionInInitializerError extends Error. The JVM throws this Error when any exception is thrown while initializing a static variable or a static block. 
+2. OutOfMemoryError extends Error. The JVM throws this Error when it runs out of memory. This usually happens when a programs creates too many objects. 
+3. StackOverflowError extends Error. The JVM throws this Error when the thread executing the method runs out of stack space.
+
+- Exceptions thrown by Application Programmer
+1. IllegalArgumentException extends RuntimeException. This exception is thrown when a method receives an argument that the programmer has determined is not legal. 
+2. NoClassDefFoundError extends Error.Although it is an Error but it is not thrown by the JVM. It is thrown by a class loader (which is just another class in Java standard library) when it is not able to find the definition of a class that it is trying to load. Beginners get this error often while trying to run their program. For example, if your class has a package statement but you have not put the class file in its proper directory structure, the system class loader will not be able to find that class when you try to run it and will throw this error.
+3. NumberFormatException extends IllegalArgumentException. This exception is thrown when a method that converts a String to a number receives a String that it cannot convert. 
+4. SecurityException extends RuntimeException. This exception is thrown if the Security Manager refuses to permit the requested operation due to restrictions placed by the JVM. For example, when a Java program runs in a sandbox (such as an applet) and tries to use prohibited APIs such as File I/O, the security manager throws this exception. Since this exception is explicitly thrown using the new keyword by a security manager class, it can be considered to be thrown by the application programmer. 
+
+- If there is a possibility of a checked exception getting thrown out of a method, then that exception or its superclass exception must be declared in the throws clause of the method. 
+Some of valid method declaration for methods throwing exception
+1. void foo(int x) throws Exception{
+    if(x == 2) throw new Exception(); //throws Exception only if x==2
+    else return;
+}
+
+2. void foo() { //no throws clause necessary
+    if(someCondition) throw new RuntimeException();
+    else throw new Error();
+}
+
+3. void foo() throws Exception{
+    if(someCondition) throw new java.io.IOException(); //throwing a sub-exception
+    else return;
+}
+
+4. void foo() throws java.io.IOException{ //will not compile
+    if(someCondition) throw new Exception(); //throwing a super-exception
+    else return;
+} 
+
+5. void foo() throws java.io.IOException, java.sql.SQLException //can throw a common superclass exception as well.
+{  
+    if(someCondition) throw new java.io.IOException();
+    else throw new java.sql.SQLException();
+}
+
+6. void foo() throws Exception, java.io.IOException{//specifying IOException is redundant because IOExcception is a subclass of Exception
+    if(someCondition) throw new java.io.IOException();
+    else throw new java.sql.SQLException();
+}
+
+7. void foo() throws Exception{ //declaring Exception in the throws clause even though it is not thrown by the method body
+   System.out.println("hello");
+}
+
+8. void foo1() {
+    try{
+       if(someCondition) throw new Exception(); //will be caught by the catch block
+       else return;
+    }catch(Exception e){
+       
+    }
+}
+
+9. void foo2() throws Exception{
+    try{
+       if(someCondition) throw new Exception(); 
+       else return;
+    }finally {
+       System.out.println("in finally"); //will be executed but the exception is not caught here
+    }
+}
+
+10. void foo() throws Throwable{
+    if(true) throw new Exception();
+    else return;
+}
+
+- Therefore, if a static initializer ends up throwing an exception, there is no way for the application to handle that exception and to recover from it. For this reason, a static initializer is not allowed to throw any checked exception. If the compiler sees a possibility of a checked exception getting thrown out of a static initializer, it will generate an error.
+
+- However, an instance initializer has the same problem as a static initializer - there is no way to specify a throws clause for an instance initializer. Recall that an instance initializer is executed no matter which constructor of the class is invoked. In that sense, an instance initializer is kind of a part of each constructor of the class. Therefore, an exception thrown from an instance initializer can be thought of as an exception thrown by every constructor of the class. Thus, if we declare an exception thrown from an instance initializer in the throws clause of each constructor of the class, we should be good.
+e.g TestClass() throws Exception{}
+
+- Just like a method, a constructor is allowed to throw any exception as long as it declares that exception in its throws clause. However, there is one important difference between a method and a constructor. Recall that the first line of every constructor is always a call to a constructor of its super class or to another constructor of the same class. Thus, if a constructor decides to throw an exception, it has an impact on the subclass because that exception will be propagated to the subclass constructor as well. Therefore, if a subclass constructor invokes a superclass constructor that throws an exception, that subclass constructor must also declare that exception in its throws clause.
+
+- It is ok to use a catch block with a broader exception class to catch a narrower exception.
+
+- The reverse, i.e., using a catch block with a narrower exception to catch a broader exception is not acceptable.
+
+- If a method doesn't want to catch the exception then it must declare that exception (or its superclass) in its throws clause. This is no different from the rule that you have seen before while creating a method that throws an exception. 
+
+- Unreachable catch blocks. What if you move the catch(IOException ioe) block before the catch(FileNotFoundException fnfe) block? Well, the code will fail to compile. The catch(IOException ioe) clause will always satisfy a FileNotFoundException and so the control will never get to enter catch(FileNotFoundException fnfe) block.
+
+- But remember that a catch block associated with a nested try statement is cannot catch an exception thrown by the outer try block. 
+
+- It is possible to rethrow the same exception (or throw a new one) from the catch block. You may want to do this if you want to do something upon receiving an exception before letting it propagate up the call chain. Of course, if it is a checked exception you would have to declare it in the throws clause of the method. The same effect can be achieved with a finally block. 
+
+- Since there is no catch block to catch the Exception thrown by method from catch/finally block, the exception will automatically be thrown out of the method to the caller of method, but only after the code in the finally block is executed.
+
+- If you throw an exception from the finally block, then the exception thrown from the try block or the catch block is ignored, and the exception thrown from the finally block is what gets thrown out of the method. 
+
+- Even though the catch block throws Exception, the JVM doesn't throw it to the caller of bar. It waits until the finally block finishes execution. However, the finally block throws a new IOException. So the JVM ignores the Exception that it was about to throw to the caller and throws the IOException instead. As far as the compiler is concerned, it realizes that bar can only throw an IOException and not Exception to the caller and therefore, it is ok with listing just IOException in bar's throws clause.
+
 
 MAIN OBSERVATIONS
 -----------------
@@ -623,4 +770,4 @@ unnamed package is not allowed in named modules (see question 35)
 
 Current read
 ------------
-Programming Abstractly Through Interfaces - Ques 80
+Handling Exceptions

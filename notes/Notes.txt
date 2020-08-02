@@ -530,14 +530,14 @@ Handling Exceptions (8 questions) -- 63%
  
 
 - In exception handling order in which catch block is specified matter. if subclass exception is specified after super
-class exception, then it will be a compile error.
+class exception, then it will be a compile error, compiler will state is as unreachable code.
 
 - RuntimeException can be thrown without any need to be declared in throws clause of surrounding method.
 throw (RuntimeException)e;` doesn't cause any compilation error. Even though variable 'e' is type casted to
 RuntimeException but exception object is still of ArithmeticException, which is caught in main method and
 'AE' is printed to the console. (Ques 6)
 
-- Java doesn't allow to catch specific checked exceptions if these are not thrown by the statements inside try block.
+- Java doesn't allow to catch specific checked exceptions if these are not thrown by the statements inside try block.<--- Verify this
 
 - If an instance of Exception is thrown by the catch-block but another catch-block at the same level are not executed.
 Explaining this point further, in a try catch block with multiple catch blocks only one of the catch block is executed
@@ -679,7 +679,7 @@ Some of valid method declaration for methods throwing exception
 - However, an instance initializer has the same problem as a static initializer - there is no way to specify a throws clause for an instance initializer. Recall that an instance initializer is executed no matter which constructor of the class is invoked. In that sense, an instance initializer is kind of a part of each constructor of the class. Therefore, an exception thrown from an instance initializer can be thought of as an exception thrown by every constructor of the class. Thus, if we declare an exception thrown from an instance initializer in the throws clause of each constructor of the class, we should be good.
 e.g TestClass() throws Exception{}
 
-- Just like a method, a constructor is allowed to throw any exception as long as it declares that exception in its throws clause. However, there is one important difference between a method and a constructor. Recall that the first line of every constructor is always a call to a constructor of its super class or to another constructor of the same class. Thus, if a constructor decides to throw an exception, it has an impact on the subclass because that exception will be propagated to the subclass constructor as well. Therefore, if a subclass constructor invokes a superclass constructor that throws an exception, that subclass constructor must also declare that exception in its throws clause.
+- Just like a method, a constructor is allowed to throw any exception as long as it declares that exception in its throws clause. However, there is one important difference between a method and a constructor. Recall that the first line of every constructor is always a call to a constructor of its super class or to another constructor of the same class. Thus, if a constructor decides to throw an exception, it has an impact on the subclass because that exception will be propagated to the subclass constructor as well. Therefore, if a subclass constructor invokes a superclass constructor that throws an exception, that subclass constructor must also declare that exception in its throws clause. try/catch block usually doesn't work in constructor, again because first line has to be a call to constructor of its super class or to another constructor of the same class.
 
 - It is ok to use a catch block with a broader exception class to catch a narrower exception.
 
@@ -718,6 +718,14 @@ required during the compilation of <module_to_compile>
 NOTE: -p option is not required if a module to compile does not require any external module to refer during compilation
 Type of module that can be referred by -p option: singlemodules, exploded modules, modular jar
 
+- command to create jar files
+jar -c -e <main_class_name> -f <jar_file_name> -C <change_to_dir_to_include_files>
+explanation of command line arguments
+-c or --create: Create the archive
+-f or --file=FILE: The archive file name
+-e or --main-class=CLASSNAME
+-C DIR: change to specified directory and include the following
+
 - command to execute modules
 java -p <module_path> -m <module>[/<mainclass>] [args...]
  -p option can also be provided as --module-path
@@ -730,11 +738,15 @@ contain command line options.
 - exploded module is module with its own directory structure and class file. In exploded module main class is
 not optional.
 
+- to create a jar file. First compile module from source file to class files as exploded module. From this exploded module create jar file as described above (jar command).
+
 - some of valid module directives
  exports
  requires
  requires transitive
 a module cannot export standard module of java platform e.g. java.se
+
+- requires or requires transitive directive should have module name and not package name in their declaration. 
 
 - requires transitive: Implied readability is to specify a transitive dependency on another module such that other
 modules reading your module also read that dependency.
@@ -762,6 +774,27 @@ unnamed package is not allowed in named modules (see question 35)
 
 - Java Platform Module System was introduced in Java 9 as project jigsaw
 
+- If a module have two packages e.g
+dev.dmohindru.example;
+dev.dmohindru.example.test;
+
+and moduel-info.java has following code
+module fullyQualifiedModuleName {
+exports dev.dmohindru.example;
+}
+so this module declaration will export only dev.dmohindru.example package and not its sub package dev.dmohindru.example.test
+
+- By default, all the Java modules are dependent on java.base module. There is no need to have 'requires' directive in the module descriptor file (module-info.java) for java.base module.
+
+- To get a list of all the system modules, use below command:
+java --list-modules
+
+- And to check details of specific module (e.g. java.base), use below command:
+java --describe-module java.base
+
+
+
+
 
 
 
@@ -770,4 +803,4 @@ unnamed package is not allowed in named modules (see question 35)
 
 Current read
 ------------
-Handling Exceptions
+Understanding Modules - Ques 54

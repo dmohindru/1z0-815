@@ -706,14 +706,26 @@ MAIN OBSERVATIONS
 
 Understanding Modules (8 questions) --50%
 ------------------------------------------
+- A valid package name would therefore, be a valid module name. In short, the name must be a valid Java identifier (so, special characters such as dash and slash are out but underscore and dot are in) and it should follow the reverse domain name pattern to avoid name clash.
+
+- Module descriptor is the formal way to describe a module. Every module must have a module descriptor that specifies the name of the module, what it provides, and what it requires. A module descriptor is nothing but a file by the name module-info.java.
+
+- The directory structures for the sources and for the compiled classes of a module are almost exactly the same as that of a package. The only difference is that while a package may reside in any folder, a module resides in a folder by the same name as the module. This rule applies to the source code as well as the class files. f the module directory contains the source code, it is called "source module definition" and if the module directory contains compiled classes, it is called "module definition".
+
+- The exam expects you to be able to identify valid and invalid module names. As explained above, the rules for naming a module are the same as those for naming a package. Thus, for example, the following are valid module names: a (length is not important), _m (may start with and contain _), n$, (may start with and contain $), x1 (may contain a number) and a.b (may contain dots) but the following are invalid: 1x, (cannot start with a number), a-b, (cannot contain hyphens), and a..b (cannot contain consecutive dots).
+
+- It is possible to compile module source files without using the --module option by listing the files (either individually or using a wildcard) that you want to compile.
+
+- For the purpose of the exam, you are expected to know how to compile a module using the --module switch only.
+
+
 - command to compile modules
 javac -d <output_directory> -p <module_path> --module-source-path <root_source_directory> -m <modules_to_compile>
  -p option can also be provided as --module-path
  -m option can also be provided as --module
 -d <output_directory>: directory where compiled module will be placed
--p <module_path>: list of path separated by ; on windows and : on linux/mac which contains various modules which may be
-required during the compilation of <module_to_compile>
---module-source-path <root_source_directory>: root source directory where all modules are kept
+-p <module_path>: list of path separated by ; on windows and : on linux/mac which contains various modules which may be required during the compilation of <module_to_compile>
+--module-source-path <root_source_directory>: root source directory where all modules are kept. The compiler tries to locate this module in the paths specified in module-source-path.
 -m <module_to_compile>: name of module directory to compile. Multiple modules are separated by commas
 NOTE: -p option is not required if a module to compile does not require any external module to refer during compilation
 Type of module that can be referred by -p option: singlemodules, exploded modules, modular jar
@@ -724,7 +736,7 @@ explanation of command line arguments
 -c or --create: Create the archive
 -f or --file=FILE: The archive file name
 -e or --main-class=CLASSNAME
--C DIR: change to specified directory and include the following
+-C DIR: change to specified directory and include the following. This option is to make the jar tool change its working directory before adding files to the jar. We want it to step down to out\simpleinterest directory and then include the files from there.
 
 - command to execute modules
 java -p <module_path> -m <module>[/<mainclass>] [args...]
@@ -734,6 +746,12 @@ module_path(s) are separated by ; on windows and : on linux/mac
 if each different module paths contain same module in them then first module path containing the requested module
 is executed and other module paths are ignored. (see question 12). -m option should be the last option as it could
 contain command line options.
+
+- Note that the requirement of having the module-info.class in the root folder of the jar implies that it is not possible to package multiple modules in the same jar. In other words, you can have only one module per jar.
+
+- You won't be tested on how to create a jar file in the exam. However, executing a module packaged in a jar file is on the exam. So, it would be good if you understand how a modular jar file is created.
+
+- A module-path contains all the locations where you want the JVM to search for module definitions. While trying to load a module, the JVM looks for that module in all the locations specified in the module-path. It expects to find exactly one of the two things - a directory with the same name as the name of the module or a jar file containing module-info.class for that module. The name of the jar file is not important because the JVM takes the name of the module from the module-info.class contained in the jar file. The same module should not be present more than once on the module-path, otherwise the JVM will complain.
 
 - exploded module is module with its own directory structure and class file. In exploded module main class is
 not optional.
@@ -792,6 +810,12 @@ java --list-modules
 - And to check details of specific module (e.g. java.base), use below command:
 java --describe-module java.base
 
+- just reconcile keyword module, requires, to need module names and export need package name. e.g
+module <module_name> {
+	requires <module_name>;
+	exports <package_name> to <module_name(s)_comma_seperated>;
+	exports <package_name_1>;
+}
 
 
 

@@ -817,14 +817,92 @@ module <module_name> {
 	exports <package_name_1>;
 }
 
+- Duplicate import statement vs duplicate requires/export clauses
+Having duplicate import statements in a Java source file doesn't make any sense but Java has, historically, permitted duplicate import statements. However, Java does not permit having duplicate requires clauses in a module info. Therefore, the following module-info.java will not compile:
+module hr{
+   requires valueobjects;
+   requires valueobjects; //duplicate, not allowed
+}
 
+- Requiring the same module in a requires clause and in a requires transitive clause is not allowed either. Thus, the following will not compile:
+module hr{
+   requires valueobjects;
+   requires transitive valueobjects; //duplicate, not allowed
+}
 
+- Compiling multiple modules
+javac -d out --module-source-path src --module calculators,simpleinterest
+In fact, Java will compile the calculators module even without us specifying it explicitly in the --module switch because javac will notice that simpleinterest requires calculators and so, it will compile calculators first. However, this is possible only when the source code of the module is organized correctly in the package driven directory structure. If the source files are organized differently, javac will not be able to locate them on its own.
 
+- We can specify as many directories as we need separated by the path separator (; on windows and : on *nix). The difference between specifying a directory and specifying a jar is that when you specify a directory, all the jars as well as exploded module definitions present in that directory become available to the compiler (or to the jvm, in the case of execution), while in the other case, only the jar that you specify on the module path becomes available.
 
+- a modular jar is no different from a regular non-modular jar from in terms of its structure. The only thing extra in a modular jar is the module-info.class in its root folder. In fact, it is possible to use a modular jar just like a non-modular jar. If you are wondering whether you can run the main class of a modular jar file the old way, then yes, you can. 
 
+java -classpath calculators.jar;simpleinterest.jar simpleinterest.SimpleInterestCalculator 
 
+- How will your code access classes from the non-modular jar? It is actually a very common scenario. You might want to use a third party logging framework, a JDBC driver, or a connection manager in your application. Java modules functionality provides a nice way to handle such situations. If you simply put a non-modular jar on the module-path, Java will consider the non-modular jar to be a module. Such a module is called automatic module and the name of this module is created automatically using the name of the jar file.
+
+- Since there is no module-info.class in a non-modular jar, there is no way to specify the packages that it exports using the exports clauses or to specify the jars that it depends on using the requires clauses. For this reason, Java provides an automatic module with two special powers:
+1. an automatic module exports all its packages (so that any module can "read" those packages) and
+2. an automatic module is allowed to read all exported packages of modules that are available on the module-path as well as all classes available on the classpath.
+For example, let's say our simpleinterest module requires com.mysql.jdbc.Driver class from mysql-driver-6.0.jar. We need to update the module info for simpleinterest as follows:
+module simpleinterest{
+   requires mysql.driver; //Observe that we are only specifying the module name here. All packages are exported automatically by an automatic module.
+}
+and, assuming that mysql-driver-6.0.jar is present in the jars directory, we will include it in the module-path of our javac as well as java commands as follows:
+javac --module-path jars\mysql-driver-6.0.jar --module-source-path src -d out --module simpleinterest 
+java --module-path jars\mysql-driver-6.0.jar;out --module simpleinterest/simpleinterest.SimpleInterestCalculator
+
+- We must create an automatic module out of a non-modular jar only if a modular jar is statically dependent on a class from a non-modular jar, i.e., if a module refers to a class from the non-modular jar in its code and therefore, requires it during compilation. If an automatic module requires a class from a non-modular jar, you need to simply place the non-modular jar on the classpath during the execution of the module. Remember the second super power of an automatic module - an automatic module is allowed to read all classes available on the module-path as well as on the classpath. That is what makes it work. 
+Thus, all we need to do is to include this jar on the classpath in our java command as follows:
+java -classpath jars\commons-logging.jar --module-path jars\mysql-driver-6.0.jar; --module simpleinterest/simpleinterest.SimpleInterestCalculator
+
+- Summary of command line switches used for compilation
+1. --module-source-path: This switch is used to specify the location of the module source files.
+2. -d: This switch is required when you compile a module. It is used to specify the output directory. This is the directory where javac will generate the module and package driven directory structure and the class files for the sources.
+3. --module or -m: This switch is used when you want to compile all the source files of a particular module. This option is helpful when you want to compile all the files at once without listing any of the source files of a module individually in the command.
+4. --module-path or -p: This option specifies the location(s) of any other module upon which the module to be compiled depends. You can specify the module directories or jar files containing the module classes here.
+5. -classpath: This option is used for compilation of non-modular code. If you are compiling regular non-modular code but that code depends on some classes, then you can put those classes/jars on the classpath using -classpath option.
+
+Summary of command line switches used for execution
+1. --module-path or -p: This switch tells the location of the module definition. If the module is packaged in a jar file, then you can either specify the path to the jar, or specify the path to the directory where the jar file stored (relative to the current directory or an absolute path). 
+For example, --module-path c:\javatest\modulejars. You can also specify the location where the compiled module exists in the exploded form. For example, if your module is named abc.math.utils and this module is stored in c:\javatest\output, then you can use: --module-path c:/javatest/output.  Remember that c:\javatest\output directory must contain abc.math.utils directory and the module files (including module-info.class) must be present in their appropriate directory structure under abc.math.utils directory.
+2. --module or -m: This switch is used to specify the module that you want to run. For example, if you want to run abc.utils.Main class of abc.math.utils module, you should write --module abc.math.utils/abc.utils.Main
+If a module jar's manifest contains the Main-Class property, you can omit the main class from the command. For example, you can write, --module abc.math.utils instead of --module abc.math.utils/abc.utils.Main.
+3. -classpath or --class-path or -cp: This switch is used while executing non-modular code. It is also used while executing a modular code to specify non-modular jars that are required by the project.
+
+- By Java 8, the standard Java library, with over four thousand five hundred classes, had become a big monolithic pile of interdependent classes and packages that was impossible to split into smaller independent pieces. Even if an application used a very small part of the runtime library, it still had to be bundled with the whole library. You might have heard about a jar file named rt.jar that every Java installation comes with. This 60 MB jar file contains the complete Java SE library. If you ever wanted to distribute your Java application comprising just a single class, you would have to include this huge jar file along with it.
+Modular JDK is an effort to solve this problem. It divided the JDK into several loosely coupled modules that can be combined at compile time, build time, as well as run time, into a variety of configurations as per the needs of the applications. For example, a large service side application can use the full JDK but a micro-service can be packaged with only the modules that are absolutely essential. It also allows applications that are bundled along with the runtime, to be shipped with smaller profiles, thus, increasing the reach of Java applications to more devices and platforms. 
+
+- The modules that are governed by the Java Community Process (JCP) are called Standard modules. Their names start with java. For example, java.base, java.sql, and java.logging are standard modules. All other modules that are specific to a JDK are called non-standard modules. Their names start with jdk. For example, jdk.jdeps, jdk.rmic, and jdk.javadoc are non-standard modules.
+
+- It is important to know that a standard module may contain non-standard packages but a non-standard module does not contain any standard package.
+
+- The Java SE Platform: The Java Platform, Standard Edition (Java SE) is the core Java platform for general-purpose computing. It is composed only of the standard modules (i.e. whose names start with java) and is required to be supported by all Java implementations. most commonly used modules in this platform are java.base, java.desktop, java.logging, java.sql, java.prefs, java.desktop, and java.net.http.
+
+- If your module "requires" only the modules contained in the Java SE platform, it will depend only on the standard Java packages and will be portable to all Implementations of the Java SE Platform.
+
+- The java.base Module: This module defines the foundational APIs of the Java SE platform. By foundational, we mean that it lies at the core of all Java platforms. This module doesn't require any other module but every other module depends on this module. Again, you need not remember the complete list of packages contained in this module but here are a few important packages that you should be aware of - java.lang, java.lang.annotation, java.io, java.nio, java.net, java.util, java.util.concurrent, java.security, and java.time. Of course, java.lang.Object belongs to this module, after all! But did you notice that we never wrote requires java.base; in the module declarations of the modules that we developed in the previous section? The reason is that since everything in Java requires packages exported from this module, the Java compiler does not require it to be specified explicitly. In other words, much like the java.lang package is not required to be imported in a class explicitly, the java.base module is not required to be specified in a requires clause of a module explicitly. It is always assumed to be "required". 
+
+- Note that you may see the use of phrases such as "core APIs" or "core packages" in problem statements or options of the questions in the exam. You should mark such options as incorrect. On the other hand, the phrase "foundational APIs" is used by the official  API description and is, therefore, correct. So, for the purpose of the exam, java.base defines all the "foundational APIs" and not all the "core APIs" of the Java platform.
+
+- When you graduate to developing industrial strength Java applications, you will use several other tools such as jdb, javadoc, javap, and javaw.
+
+- Command line options related to modules
+--show-module-resolution: This new switch is applied to the java command to make it print module resolution information while executing a Java program. Basically, if you want to know what all modules are being referred to while running a program, this is the option to use. Note that the show-module-resolution option shows module level details only. It doesn't tell you which package or which class from a module is actually required. 
+
+- jdeps is a new tool specifically designed to help you deal with modules without executing them. Using this tool, you can find out module, package, as well as class level dependencies of a given module. It can analyze an exploded module or a module jar. 
+
+- jmod: Java 9 also introduces a new way to package Java code into "jmod" files. This packaging method is used when you need to package artifacts such as native code that can't be put in jar files. However, a jmod file cannot be executed and is therefore, only used at compile time and link time. It is not a replacement for jar files. Don't worry, you don't need to know anything about jmod files. But you may see it mentioned in an exam question as an option. If you see any option that mentions jmod, it is most likely an incorrect option.
+
+- Benefits of the modular JDK
+1. It makes the Java platform more easily scalable down to small devices. Since Java classes and packages are distributed into modules, it is possible to create a configuration with a small footprint by packaging just the modules that are required. For example, if an application does not require any GUI, there is no need to package the java.desktop module with it.
+2. It improves security and maintainability. Before modules, all members of all classes, irrespective of their access modifiers, were accessible through reflection API. Now, by encapsulating packages into modules, the JVM is able to restrict reflective access only to packages that explicitly allow it. The use of explicit exports and requires clauses prevent inadvertent dependence on classes that are not meant to be used outside a module.
+3. It improves application performance by not requiring unnecessary classes to be packaged and/or loaded.
+4. It is backward compatible. It is not required for an application to be structured as modular to be run on the modular JDK. A non-modular application will still run just like before on the modular JDK using the -classpath option.
+5. Customization is possible. It is possible to make the packages that are not exported explicitly in the module descriptor accessible through the use of appropriate command line options. For example, if a module does not export a package, you can still use the --add-exports option to make it accessible to other modules. Of course, this option breaks the encapsulation mechanism and is undesirable. It should be used only in exceptional circumstances.
 
 
 Current read
 ------------
-Understanding Modules - Ques 54
+

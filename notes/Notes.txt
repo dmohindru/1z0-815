@@ -21,8 +21,11 @@ java --source 11 Test.java . Instructs the java command to process the Test.java
 
 - Starting with JDK 11, it is possible to launch single-file source-code Programs. 
 
+- class name can start with $ or _
+
 Working With Java Primitive Data Types and String APIs
 ------------------------------------------------------
+- long and int can be assigned to float and double with any casting.
 - substring(int start, int to): start is inclusive, to in exclusive
 - cannot use local variable without initializing it.
 - toString method of StringBuilder class uses String constructor and does not use String literal. Hence when checked for
@@ -47,6 +50,8 @@ and following statement is invalid statement
 var x = 7, y = 8;
 
 - Local variable Type inference was added in JDK 10 (var).
+- var x = "Java"; //x infers to String
+- var m = 10; //m infers to int
 - casting wider primitive data type to narrower data type is possible in java as in C or other language. 
 eg. byte b = (byte) 100000; would take eight bit value from 100000 and store in byte b.
 
@@ -63,6 +68,19 @@ If operand is not null, then the conversion is performed as if by an invocation 
 
 - String class implements CharSequence. Hence reference variable of type CharSequence can point to String objects.
 
+- Please note that Strings computed by concatenation at compile time, will be referred by String Pool during execution. Compile time String concatenation happens when both of the operands are compile time constants, such as literal, final variable etc.
+Whereas, Strings computed by concatenation at run time (if the resultant expression is not constant expression) are newly created and therefore distinct.
+
+- (num++ == num++) // will result in false. say initial value of num = 10
+(10 == num++) //Left side operand is evaluated first, value 10 is used in the expression and variable num is incremented by 1, so num=11
+(10 == 11) //Right side operand is evaluated next, value 11 is used in the expression and variable num is incremented by 1, so num = 12
+
+- var type cannot be used as method parameters or method return type.
+
+- Syntax of labels used in java loops
+one: for (var i = 0; i < 10; i++) {
+two: for (var j = 0; j < 7; j++) {
+three: while (true) { } } }
 
 MAIN OBSERVATIONS
 -----------------
@@ -81,8 +99,7 @@ stringVal member variable to ParentClass with is not possible as ParentClass in 
 Hence compilation error is generated.
 
 - Array mismatch return first position where a miss match is found (0 based). So if position is 3, then mismatch
-method will return 3 - 1 = 2. mismatch return -1 if no mismatch is found and null pointer position if either array is
-null
+method will return 3 - 1 = 2. mismatch return -1 if no mismatch is found and NullPointerException is thrown if either array is null.
 
 - compare(x, y) return results as below
 char: x - y
@@ -125,6 +142,15 @@ e.g. -val-- would evaluate as -(val--) what this expression does it get the valu
 e.g. -(++val) what this expression does it get the value of val, increment it by one and return its negated value. 
 So if val = 9, then above expression would return -10 and after evaluating this expression value of val is 10 
 
+- byte val = 127;
+val = val + 1; // result in int does not compile
+val = val = 1; // result in int does not compile
+val++; // result val = (byte)(val + 1) compiles ok
+val--; // result val = (byte)(val - 1) compiles ok
+val *= 2; // result in val = (byte)(val*2); compile ok
+val -= 10; // results in val = (byte)(val - 10); compiles ok
+
+
 
 MAIN OBSERVATIONS
 -----------------
@@ -146,11 +172,11 @@ of compare method of their respective primitive types.
 - Declaration of type var variable_name = {1, 2, 3} also not allowed as Explicit target-type is needed for the
 array initializer. E.g. var variable_name = new int[]{1, 2, 3}
 
-- int [] arr1 = new int[8];` Creates one-dimensional array object to store 8 elements and arr1 refers to it. This statement compiles without any error.
+- int [] arr1 = new int[8]; Creates one-dimensional array object to store 8 elements and arr1 refers to it. This statement compiles without any error.
 
-- int [][] arr2 = new int[8][8];` Creates two-dimensional array object to store 8 * 8 = 64 elements. This statement also compiles fine.
+- int [][] arr2 = new int[8][8]; Creates two-dimensional array object to store 8 * 8 = 64 elements. This statement also compiles fine.
 
-- int [] arr3 [] = new int[8][];` Creates two-dimensional array object, whose 1st dimension is 8 but 2nd dimension is not yet defined. On the left side array symbols can be used before the reference variable or after the reference variable or can be mixed, hence int [][] arr3, int [] arr3 [] and int arr3[][] all are valid. This statement compiles successfully.
+- int [] arr3 [] = new int[8][]; Creates two-dimensional array object, whose 1st dimension is 8 but 2nd dimension is not yet defined. On the left side array symbols can be used before the reference variable or after the reference variable or can be mixed, hence int [][] arr3, int [] arr3 [] and int arr3[][] all are valid. This statement compiles successfully.
 
 - int arr4[][] = new int[][8];: 1st array dimension must be specified at the time of declaration. new int[][8]; causes compilation error as 1st dimension is not specified.
 
@@ -181,6 +207,12 @@ Object[] obj[] =  { {"string is also an object"}, {null } , { new Object() , new
  
 - Be very observant about question asking you what options to choose so that program compiles only and not cause runtime exception. Or program that compiles
 and executes successfully. These two question would have different answers. 
+
+- array variable are incompatible with each other even though its base data type are compatible.
+e.g int[] intArray; long[] longArray;
+longArray = intArray; // incompatible type will not compile
+long longVar; int intVar;
+longVar = intVar; // compatible type will compile without any issue.
 
 
 MAIN OBSERVATIONS
@@ -244,20 +276,23 @@ void processData(Integer value){ }
 
 Applying Encapsulation (2 questions) -- 100%
 --------------------------------------------
-- access modifier in order from most to least restrictive private,
-default (no access modifier specified with is package-private), protected, public
+- access modifier in order from most to least restrictive private, default (no access modifier specified with is package-private), protected, public
 
 - if java file contains non public class and public class it will compile successfully. But non public class will
 only be visible in its package only while public class is access anywhere (verify it).
 
+- public members of default access modifier class. cannot be access from outside of current package 
+
 
 Reusing Implementations Through Inheritance (6 questions) -- 67%
 ----------------------------------------------------------------
-- Instance variable are hidden and not overridden by sub classes
+- Instance variable are hidden and not overridden by sub classes. There is no rules related to hiding (type and access modifier can be changed).
 
 - Dot operator has higher precedence than parentheses. e.g. (Parent)gc.quote will evaluate gc.quote first which is of
 type String. Then (Parent) cast is evaluated, but quote (String) is not of type Parent hence it will lead to compilation
 error.
+
+- Java compiler adds super(); as the first statement inside constructor, if call to another constructor using this(...) or super(...) is not available. If a super class has defined any constructor with arguments and has not defined no-arg constructor, then call to super() will fail. 
 
 - Chain of casting is also possible for subclass to super class. e.g ((Parent)(Child)gc).quote this expression will first
 cast gc object to first Child and then to Parent object. Then Parent class quote member variable is referenced.
@@ -363,9 +398,11 @@ StringBuilder sb = (StringBuilder) new String("Hello World!); // will not compil
 
 - when instanceof is used on unrelated classes its causes compilation error. The compiler will let you use instanceof operator only if it is possible for the variable to refer to an object of the type given on the right-hand side. For example, f instanceof Mango is valid because the compiler knows that the declared type of f is Fruit and since Mango is a Fruit, it is possible for f to point to a Mango. But f instanceof String will not compile because the compiler knows that there is no way f can ever point to a String.
 
-- An abstract child sub class can declare overriding method of super class as abstract.
+- An abstract child sub class can declare non-abstract overriding method of super class as abstract.
 
-- Child class can extend a concrete class and still be declared abstract.  
+- Child class can extend a concrete class and still be declared abstract.
+
+- Even if instance variable initalizers are present in class, instance variable will only be initalized after a call to super method is executed. (Test 4 - Ques 22).  
 
 
 Programming Abstractly Through Interfaces (18 questions) -- 56%
@@ -379,6 +416,10 @@ Programming Abstractly Through Interfaces (18 questions) -- 56%
 - static methods - As the name implies, static methods belong to the interface itself and not to the object implementing that interface. They are defined using the keyword static. Static methods can be marked public or private but not protected. If no access modifier is specified, they are implicitly public. Static methods cannot be marked default either. static methods are not inherited but always remain part of interface only.
 
 - Static methods of interface can only be invoked only as InterfaceName.nameOfStaticMethod(); and not by instance of class implementing the interface.
+
+- Though correct way to refer static variable is by using the type name, such as Counter.count but it can also be invoked by using Counter reference variable.
+
+- If a subclass extends from a class and implements an interface, and both super class and interface have method with same signature (interface has default method), then subclass will inherit super class method and not interface method. 
 
 - Private methods (static as well as no-static) have been allowed since Java 9 and, as explained above, they are helpful when a default and static methods gets too big and needs to be refactored into smaller internal methods without exposing the internal methods to the outside world.
 
@@ -394,7 +435,7 @@ provide an implementation.
 
 - above rule also valid if one interface have default method and other has abstract method with same signature.
 
-- In Interfaces Java allows a class to inherit multiple fields with the same name as long as you don't try to use those fields ambiguously. To remove ambiguity use fields with their Interface name. e.g. Interface1.myVar and Interface2.myVar
+- In Interfaces Java allows a class to inherit multiple fields from interface(s) with the same name as long as you don't try to use those fields ambiguously. To remove ambiguity use fields with their Interface name. e.g. Interface1.myVar and Interface2.myVar
 
 - Syntax for interface to extend interface
 single interface: Interface Interface2 extends Interface1 {}
@@ -433,7 +474,7 @@ class B extends A { void processData(List<String> data){}} is an valid override
 > List
 > ArrayList
 
-- It declares only the methods that are applicable to all sorts of collections and leaves the methods that deal with specialized features such as ordering or uniqueness of elements to sub-interfaces such as List and Set. For example, Collection declares add(Object e) and remove(Object e) methods but does not declare add(int index, Object e) and remove(int index) because the concept of ordering is not applicable to all collections. We use the Collection interface when we don't want to make any assumption about the characteristics of the group of objects. In other words, if we get a Collection object, all we know is that it contains a bunch of elements.
+- Collection interface declares only the methods that are applicable to all sorts of collections and leaves the methods that deal with specialized features such as ordering or uniqueness of elements to sub-interfaces such as List and Set. For example, Collection declares add(Object e) and remove(Object e) methods but does not declare add(int index, Object e) and remove(int index) because the concept of ordering is not applicable to all collections. We use the Collection interface when we don't want to make any assumption about the characteristics of the group of objects. In other words, if we get a Collection object, all we know is that it contains a bunch of elements.
 
 - Advantages of ArrayList ☝
 1. Dynamic sizing - An ArrayList can grow in size as required. The programmer doesn't have to worry about the length of the ArrayList while adding elements to it.
@@ -505,6 +546,14 @@ syntax InterfaceName.variableName. But reference type can also point to interfac
 - add(int index, E element) inserts element at index. It returns void. if index is < 0 or > list length, then
 IndexOutOfBound exception is thrown.
 
+- But note, java.util.ConcurrentModificationException will never be thrown for traditional for loop. It is thrown for for-each loop or while using Iterator/ListIterator.
+
+- In this case `animals.remove(new StringBuilder("Alligator"));` will never remove any items from the list as StringBuilder class doesn't override the equals(Object) method of Object class.
+
+- lambda expression can reference enclosing class instance variable as this.variablename.
+
+- lambda expression can hide instance variable by redeclaring its own variable inside its {} block of code.
+
 
 
 
@@ -533,11 +582,11 @@ Handling Exceptions (8 questions) -- 63%
 class exception, then it will be a compile error, compiler will state is as unreachable code.
 
 - RuntimeException can be thrown without any need to be declared in throws clause of surrounding method.
-throw (RuntimeException)e;` doesn't cause any compilation error. Even though variable 'e' is type casted to
+throw (RuntimeException)e; doesn't cause any compilation error. Even though variable 'e' is type casted to
 RuntimeException but exception object is still of ArithmeticException, which is caught in main method and
 'AE' is printed to the console. (Ques 6)
 
-- Java doesn't allow to catch specific checked exceptions if these are not thrown by the statements inside try block.<--- Verify this
+- Java doesn't allow to catch specific checked exceptions if these are not thrown by the statements inside try block.<--- Verified
 
 - If an instance of Exception is thrown by the catch-block but another catch-block at the same level are not executed.
 Explaining this point further, in a try catch block with multiple catch blocks only one of the catch block is executed
@@ -549,9 +598,6 @@ try/catch block or add throws clause to method signature.
 
 - Casting Super class Exceptions like RuntimeException to sub class exception like ArithmeticException will cause ClassCastException to be thrown.
 
-- Hierarchy of Exception framework
-java.lang.Throwable (Root of all exception classes, is covered under checked exception)
-
 - An overriding method can only throw Checked exception and its sub type if and only if super class overridden method declared it throws checked exception.
 
 - For instance if super class method throws IOException, so its legal for sub class to override a method with FileNotFoundException. But if super class overridden method is called in sub class overriding method, using super keyword then it will cause a compilation error as super class method throws a wider exception (IOException) and sub class throws only narrower exception (FileNotFoundException), which is illegal in java. Same rationale can be used in try catch block also, if try block throws wider exception and catch block only have narrower exception, it will be a compilation error. 
@@ -562,6 +608,8 @@ java.lang.Throwable (Root of all exception classes, is covered under checked exc
 
 - multi catch syntax: catch (Exception1 | Exception2 ex) {}. But Exception1 and Exception2 must be unrelated exception i.e. they should not have any is-a relationship.
 
+- It is legal to throw exception as null with throw clause. But this would cause NullPointerException when this exception is catched tried to access its methods.
+
 - According to overriding rules, if super class / interface method declares to throw a checked exception, then overriding method of sub class / implementer class has following options:
 1. May not declare to throw any checked exception.
 2. May declare to throw the same checked exception thrown by super class / interface method.
@@ -571,6 +619,19 @@ java.lang.Throwable (Root of all exception classes, is covered under checked exc
 6. May declare to throw any RuntimeException or Error.
 
 - Java follows a convention in naming exception classes. This convention is sometimes helpful in determining the kind of exception you are dealing with. The name of any class that extends Error ends with Error and the name of any class than extends Exception ends with Exception. For example, OutOfMemoryError and StackOverflowError are Errors while IOException, SecurityException, IndexOutOfBoundsException are Exceptions. However, there is no way to distinguish between unchecked exceptions that extend RuntimeException and checked exceptions just by looking at their names. It is therefore, important to memorize the names of a few important runtime exception classes, namely - NullPointerException, ArrayIndexOutOfBoundsException, ArithmeticException, ClassCastException, and SecurityException.
+
+- It is ok to catch an exception with wider class in catch block and rethown it. But if a exception variable is reassigned in catch block it will cause compilation error. e.g.
+private static void getData() throws SQLException {
+        try {
+            throw new SQLException();
+        } catch (Exception e) {
+            e = new SQLException(); // this line cause compilation error.
+            throw e;
+        }
+    }
+
+- Hierarchy of Exception framework
+java.lang.Throwable (Root of all exception classes, is covered under checked exception)
 
 Checked Exceptions
 ------------------
@@ -710,7 +771,7 @@ Understanding Modules (8 questions) --50%
 
 - Module descriptor is the formal way to describe a module. Every module must have a module descriptor that specifies the name of the module, what it provides, and what it requires. A module descriptor is nothing but a file by the name module-info.java.
 
-- The directory structures for the sources and for the compiled classes of a module are almost exactly the same as that of a package. The only difference is that while a package may reside in any folder, a module resides in a folder by the same name as the module. This rule applies to the source code as well as the class files. f the module directory contains the source code, it is called "source module definition" and if the module directory contains compiled classes, it is called "module definition".
+- The directory structures for the sources and for the compiled classes of a module are almost exactly the same as that of a package. The only difference is that while a package may reside in any folder, a module resides in a folder by the same name as the module. This rule applies to the source code as well as the class files. If the module directory contains the source code, it is called "source module definition" and if the module directory contains compiled classes, it is called "module definition".
 
 - The exam expects you to be able to identify valid and invalid module names. As explained above, the rules for naming a module are the same as those for naming a package. Thus, for example, the following are valid module names: a (length is not important), _m (may start with and contain _), n$, (may start with and contain $), x1 (may contain a number) and a.b (may contain dots) but the following are invalid: 1x, (cannot start with a number), a-b, (cannot contain hyphens), and a..b (cannot contain consecutive dots).
 
@@ -721,8 +782,8 @@ Understanding Modules (8 questions) --50%
 
 - command to compile modules
 javac -d <output_directory> -p <module_path> --module-source-path <root_source_directory> -m <modules_to_compile>
- -p option can also be provided as --module-path
- -m option can also be provided as --module
+-p option can also be provided as --module-path
+-m option can also be provided as --module
 -d <output_directory>: directory where compiled module will be placed
 -p <module_path>: list of path separated by ; on windows and : on linux/mac which contains various modules which may be required during the compilation of <module_to_compile>
 --module-source-path <root_source_directory>: root source directory where all modules are kept. The compiler tries to locate this module in the paths specified in module-source-path.
@@ -753,8 +814,7 @@ contain command line options.
 
 - A module-path contains all the locations where you want the JVM to search for module definitions. While trying to load a module, the JVM looks for that module in all the locations specified in the module-path. It expects to find exactly one of the two things - a directory with the same name as the name of the module or a jar file containing module-info.class for that module. The name of the jar file is not important because the JVM takes the name of the module from the module-info.class contained in the jar file. The same module should not be present more than once on the module-path, otherwise the JVM will complain.
 
-- exploded module is module with its own directory structure and class file. In exploded module main class is
-not optional.
+- exploded module is module with its own directory structure and class file. In exploded module main class is not optional.
 
 - to create a jar file. First compile module from source file to class files as exploded module. From this exploded module create jar file as described above (jar command).
 
@@ -764,12 +824,21 @@ not optional.
  requires transitive
 a module cannot export standard module of java platform e.g. java.se
 
+- Wild-card (*) is not allowed with the package names
+
 - requires or requires transitive directive should have module name and not package name in their declaration. 
 
-- requires transitive: Implied readability is to specify a transitive dependency on another module such that other
-modules reading your module also read that dependency.
+- requires transitive: Implied readability is to specify a transitive dependency on another module such that other modules reading your module also read that dependency.
 For example, if module C has `requires B;` (C reads B) and module B has `requires A;` (B reads A),
 then C doesn't read A.
+
+- Access and non-access modifiers are not allowed with module declaration.
+
+- Only one module declaration is allowed in a module descriptor file.
+
+- import statements are allowed in module descriptor file. These import statements are useful when you use 'provides' directive for Services but these are not in the scope of 1Z0-815 exam. For this exam you should know that import statements are allowed in module-info.java file.
+
+- In the module descriptor file, if package specified in the exports directive is empty or doesn't exist, then compiler complains about it.
 
 To have the transitive readability, 'requires transitive' directive is used. If module C has `requires B;`
 (C reads B) and module B has `requires transitive A;` (B reads A [transitive dependency]), then C will also read A.
@@ -777,8 +846,7 @@ To have the transitive readability, 'requires transitive' directive is used. If 
 - export module to specific modules
 exports <package_name> to <comma_separated_list_of_modules>;
 if to <comma_separated_list_of_modules> is missing then package is exports to all modules
-Also note that having multiple exports directive for same package is note allowed,
-below code causes compilation error:
+Also note that having multiple exports directive for same package is note allowed, below code causes compilation error:
 
 exports com.udayankhattry.books to bookhouse;
 exports com.udayankhattry.books to onlinestore;
@@ -809,6 +877,7 @@ java --list-modules
 
 - And to check details of specific module (e.g. java.base), use below command:
 java --describe-module java.base
+--describe-module can also be specified as -d
 
 - just reconcile keyword module, requires, to need module names and export need package name. e.g
 module <module_name> {
@@ -883,6 +952,8 @@ Modular JDK is an effort to solve this problem. It divided the JDK into several 
 - If your module "requires" only the modules contained in the Java SE platform, it will depend only on the standard Java packages and will be portable to all Implementations of the Java SE Platform.
 
 - The java.base Module: This module defines the foundational APIs of the Java SE platform. By foundational, we mean that it lies at the core of all Java platforms. This module doesn't require any other module but every other module depends on this module. Again, you need not remember the complete list of packages contained in this module but here are a few important packages that you should be aware of - java.lang, java.lang.annotation, java.io, java.nio, java.net, java.util, java.util.concurrent, java.security, and java.time. Of course, java.lang.Object belongs to this module, after all! But did you notice that we never wrote requires java.base; in the module declarations of the modules that we developed in the previous section? The reason is that since everything in Java requires packages exported from this module, the Java compiler does not require it to be specified explicitly. In other words, much like the java.lang package is not required to be imported in a class explicitly, the java.base module is not required to be specified in a requires clause of a module explicitly. It is always assumed to be "required". 
+
+- java.se is an aggregator module.
 
 - Note that you may see the use of phrases such as "core APIs" or "core packages" in problem statements or options of the questions in the exam. You should mark such options as incorrect. On the other hand, the phrase "foundational APIs" is used by the official  API description and is, therefore, correct. So, for the purpose of the exam, java.base defines all the "foundational APIs" and not all the "core APIs" of the Java platform.
 

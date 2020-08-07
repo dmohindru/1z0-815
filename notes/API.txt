@@ -22,6 +22,11 @@ This method works as if by invoking the two-argument split method with the given
 
 - int indexOf(int ch)- Returns the index within this string of the first occurrence of the specified character.  Returns -1 if the character is not found.
 
+- int indexOf​(String str, int fromIndex)` method of String class returns the index within this string of the first occurrence of the specified substring, starting at the specified index. e.g.
+"alaska".indexOf("a", 1) returns 2
+"alaska".indexOf("a", 2) returns 2
+"alaska".indexOf("a", 3) returns 5
+
 - char charAt​(int index) method of String class returns the char value at the specified index. e.g. "Java".charAt(2) returns 'v'. If index is >= length of String then StringIndexOutOfBoundException is thrown.
 
 - isEmpty() method of String class returns true if and only if length() is 0.
@@ -41,8 +46,16 @@ Example - System.out.println("1234".concat("abcd")); //prints 1234abcd
 - String toLowerCase()/toUpperCase() - Converts all of the characters in this String to lower/upper case. 
 Example - System.out.println("ab".toUpperCase()); //prints AB
 
-- String replace(char oldChar, char newChar) - Returns a new string resulting from replacing all occurrences of oldChar in this string with newChar.
+- String replace(char oldChar, char newChar) - Returns a new string resulting from replacing all occurrences of oldChar in this string with newChar. Returns a string resulting from replacing all occurrences of oldChar in this string with newChar. If no replacement is done, then source String object is returned
 Example: System.out.println("ababa".replace('a', 'c')); //prints cbcbc
+it return same source object if not change are made to string object
+Example: "Java".replace('J', 'J'); // return same object
+
+- public String replace(CharSequence target, CharSequence replacement) {}:
+Returns a new String object after replacing each substring of this string that matches the literal target sequence with the specified literal replacement sequence. e.g.
+"Java".replace("a", "A") --> returns new String object "JAvA".
+"Java".replace("a", "a") --> returns new String object "Java" (it replaces "a" with "a").
+"Java".replace("m", "M") --> returns the source String object "Java" (no change).
 
 - String strip(), stripLeading(), stripTrailing(), trim() - Returns a copy of the string, with leading and/or trailing white space omitted.
 Example:
@@ -65,7 +78,10 @@ System.out.println(" 123 ".trim()); //prints "123" (without the quotes)
 
 - String.valueOf( ... ) is invoked to generate a string representation of the argument that is passed. For example, String.valueOf(123) returns the String "123"
 
-- public String repeat​(int count) Returns a string whose value is the concatenation of this string repeated count times. If this string is empty or count is zero then the empty string is returned. Throws IllegalArgumentException - if the count is negative.
+- public String repeat​(int count) Returns a string whose value is the concatenation of this string repeated count times. If this string is empty or count is zero then the empty string is returned. Throws IllegalArgumentException - if the count is negative. e.g.
+ "*".repeat(5); // would return *****
+ "*".repeat(1); // would return *
+
 
 - public static String join(CharSequence delimiter, CharSequence... elements) {...}: It returns a new String composed of copies of the CharSequence elements joined together with a copy of the specified delimiter.
 For example,
@@ -104,6 +120,8 @@ StringBuilder
 
 - public StringBuilder insert(int offset, variousDataTypes b). Inserts the string representation of the argument into this sequence. Returns reference to the StringBuilder object. If offset > length or offset < 0 then StringIndexOutOfBoundException is thrown.
 
+- StringBuilder class doesn't override the equals(Object) method of Object class.
+
 - If you pass a variable pointing to null, the string "null" is appended to or inserted in the existing StringBuilder. No NullPointerException is thrown.
 
 - For everything else, String.valueOf( ... ) is invoked to generate a string representation of the argument that is passed. For example, String.valueOf(123) returns the String "123", which is then appended to or inserted in the existing StringBuilder. In case of objects, valueOf invokes toString() on that object to get its string representation.
@@ -134,12 +152,12 @@ String toString()
 Array in Java
 -------------
 - Array.mismatch(array1, array2) return zero based index of arrays where mismatch is found. mismatch function is
-overloaded and it takes primitive data types only. boolean, char, byte, short, int, float, double.
+overloaded and it takes primitive data types only. boolean, char, byte, short, int, float, double. If no mismatch is found -1 is returned. It throws NullPointerException, if either array is null.
 
 - There are other overloaded mismatch methods for primitive types with ranges:
 
 int mismatch​(primitiveDataType[] a, int aFromIndex, int aToIndex, primitiveDataType[] b, int bFromIndex, int bToIndex)
-These methods also compares the arrays, but over the specified range. 'From' index is inclusive but 'To' index is exclusive. Please note that returned index is relative.
+These methods also compares the arrays, but over the specified range. 'From' index is inclusive but 'To' index is exclusive. Please note that returned index is relative. If no mismatch is found -1 is returned. It throws NullPointerException, if either array is null.
 
 Range version of mismatch methods throw below exceptions:
 NullPointerException: if either array is null
@@ -149,6 +167,13 @@ ArrayIndexOutOfBoundsException: if aFromIndex < 0 or aToIndex > a.length or if b
 - Array.compare(Array1, Array2), if any array (Array1, Array2) is a proper prefix of each other then function returns
 Array1.length - Array2.length. If Array1 is not sub set of Array2, then each element of arrays are compared with rules
 of compare method of their respective primitive types.
+0:  if the Array1 and Array2 array are equal and contain the same elements in the same order
+<0: if the Array1 array is lexicographically less than the Array2
+>0: if the Array1 is lexicographically greater than the Array2
+Please note:
+If Array1 is null and Array2 is not null, then compare method returns -1.
+If Array2 is null and Array1 is not null, then compare method returns 1.
+If both Array1 and Array2 are null, then compare method returns 0.
 
 - Array.equals(array) returns true if both array are equal false otherwise.
 
@@ -190,7 +215,7 @@ List Interface
 --------------
 - E get(int index): Returns the element at index. index should be > 0 and <= size -1, else IndexOutOfBoundException is thrown.
 
-- E set(int index, E e): Replaces the existing element at index with the passed object and returns the original element that was replaced. index should be > 0 and <= size, else IndexOutOfBoundException is thrown.
+- E set(int index, E e): Replaces the existing element at index with the passed object and returns the original element that was replaced. index should be > 0 and <= size - 1, else IndexOutOfBoundException is thrown.
 
 - boolean add(E e): Adds an object at the end of the list. Returns true.
 

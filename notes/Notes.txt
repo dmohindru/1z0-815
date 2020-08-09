@@ -23,6 +23,12 @@ java --source 11 Test.java . Instructs the java command to process the Test.java
 
 - class name can start with $ or _
 
+- class can have many main overloaded methods but only method with signature public static void main(String[] args) will be executed by JVM.
+
+- order of public and static is interchangable e.g below are legal decleration for main method
+public static void main(String[] args);
+static public void main(String[] args);
+ 
 Working With Java Primitive Data Types and String APIs
 ------------------------------------------------------
 - long and int can be assigned to float and double with any casting.
@@ -82,6 +88,48 @@ one: for (var i = 0; i < 10; i++) {
 two: for (var j = 0; j < 7; j++) {
 three: while (true) { } } }
 
+- initalizing a variable in if else if block based on test on variable value will cause compilation error.
+double price = 90000;
+String model;
+if(price > 100000) {
+	model = "Tesla Model X";
+} else if(price <= 100000) {
+	model = "Tesla Model S";
+}
+System.out.println(model); 
+only way initialization in if else block will succeed when there is sure shot initializing happening.
+
+- Please note that Strings computed by concatenation at compile time, will be referred by String Pool during execution. Compile time String concatenation happens when both of the operands are compile time constants, such as literal, final variable etc.
+Whereas, Strings computed by concatenation at run time (if the resultant expression is not constant expression) are newly created and therefore distinct.
+
+- var a = (int)x + (int)y; //This is a valid java statement
+
+- var cannot be used without initalizer
+var num;
+num = 10; // compile time error
+
+- var num = null; // won't compile as type cannot be inferred from null
+
+- observe the following statement important
+int i = -2;
+i = -(--i); // will result in 3
+i = -(++i); // will result in 1
+
+- wrapper classes overrides equals method
+
+- Wrapper class == works by unboxing and checking its value. But one exception is when unboxing with Integer as demonstrated by below code
+// If value of Integer is between -128 to 127 below code will print true else it will print false
+Integer i1 = Integer.valueOf(4);
+Ingeter i2 = 4;
+System.out.println(i1 == i2); // prints true
+
+Integer i1 = Integer.valueOf(128);
+Ingeter i2 = 128;
+System.out.println(i1 == i2); // prints false
+
+
+
+
 MAIN OBSERVATIONS
 -----------------
 - Under standing impact of usage of final keyword
@@ -122,7 +170,7 @@ as variable name, method name, package name or loop label. But it cannot be used
 
 - String.join api reference
 
-- For decision construct like in if, we can use wrapper Boolean class also.
+- For decision construct like in if, we can use wrapper Boolean class also. But if Boolean type variable is uninitialized to null, it will throw NullPointerException if used in if construct.
 
 - if switch construct have default clause stated on top of other case clause and if no case statement is matched then default will be executed and fall
 through all case statement if no break statement is encountered in the path.
@@ -149,6 +197,12 @@ val++; // result val = (byte)(val + 1) compiles ok
 val--; // result val = (byte)(val - 1) compiles ok
 val *= 2; // result in val = (byte)(val*2); compile ok
 val -= 10; // results in val = (byte)(val - 10); compiles ok
+
+- for loop labels keywords cannot be used like for, while etc.
+
+- Binary plus (+) has got higher precedence than != operator.
+
+- switch can accept primitive types: byte, short, int, char; wrapper types: Byte, Short, Integer, Character; String and enums. In this case long and double are invalid values to be passed in switch expression. 
 
 
 
@@ -214,6 +268,10 @@ longArray = intArray; // incompatible type will not compile
 long longVar; int intVar;
 longVar = intVar; // compatible type will compile without any issue.
 
+- cannot declare array as 
+var arr2 = {1, 2, 3}; // its compile time error
+var arr2 = new int[]{1, 2, 3};
+
 
 MAIN OBSERVATIONS
 -----------------
@@ -224,6 +282,8 @@ Describing and Using Objects and Classes (1 question) -- 100%
 -------------------------------------------------------------
 - primitive type instance variables are initialized to their respective zeros and reference types to null
 (char: \u0000, byte: 0, short: 0, int: 0, float: 0.0, double: 0.0, boolean: false)
+
+- very important var cannot be used at class member variable.
 
 
 Creating and Using Methods (5 questions) -- 80%
@@ -311,6 +371,8 @@ access modifier variable can be access via inheritance as well as through object
 - member variable inherited from super class can be access with this or super keyword.
 
 - Constructors cannot use final, abstract or static modifiers
+
+- sub class constructor cannot have both super() or this() in them. It has to either of two, as call to super() or this() has to be first statement in sub class constructor
 
 - abstract methods cannot be private, final and static
 
@@ -404,6 +466,18 @@ StringBuilder sb = (StringBuilder) new String("Hello World!); // will not compil
 
 - Even if instance variable initalizers are present in class, instance variable will only be initalized after a call to super method is executed. (Test 4 - Ques 22).  
 
+- Any super class reference variable can be casted to sub class reference variable no compilation error. But if super class reference variable points to super class object then it will cause ClassCastException, if super class reference point to null or sub class object then it will not throw any exception.
+e.g. Base --> Sub
+Base b = new Base();
+Sub s = (Sub)b; // will compile fine but will cause ClassCastException at run time
+------
+Base b = null;
+Sub s = (Sub)b; // will compile fine and will not throw any exception at run time
+
+- super.super is not allowed in java, it causes compilation error. In fact, it is not possible to directly reach to 2 levels, super keyword allows to access methods and variables of immediate parent class only (just 1 level up).
+
+- casting of super or this keyword in not allowed 
+
 
 Programming Abstractly Through Interfaces (18 questions) -- 56%
 ---------------------------------------------------------------
@@ -451,6 +525,8 @@ multiple interface: Interface Interface3 extends Interface1, Interface2, OtherIn
   
 - Inheriting interface can provide implementation of abstract methods inherited from its super interface.
 
+- To use local variables in interface a variable should be final or effectively final, else compilation error will occur.
+
 - Since, due to type erasure, generic information is removed at run time, it follows that generic information cannot be a part of the signature. Thus, two methods that differ only in their type parameters are not valid overloads.
 
 - Read about writing generic class
@@ -475,6 +551,17 @@ class B extends A { void processData(List<String> data){}} is an valid override
 > ArrayList
 
 - Collection interface declares only the methods that are applicable to all sorts of collections and leaves the methods that deal with specialized features such as ordering or uniqueness of elements to sub-interfaces such as List and Set. For example, Collection declares add(Object e) and remove(Object e) methods but does not declare add(int index, Object e) and remove(int index) because the concept of ordering is not applicable to all collections. We use the Collection interface when we don't want to make any assumption about the characteristics of the group of objects. In other words, if we get a Collection object, all we know is that it contains a bunch of elements.
+
+- Proper way to use and declare ArrayList
+List<String> list = new ArrayList<String>(); or List<String> list = new ArrayList<>();
+
+- Following declaration for ArrayList will generate warning.
+List list = new ArrayList<String>();
+List<String> list = new ArrayList();
+List list = new ArrayList();
+
+- Following declaration for ArrayList will generate error.
+List<> list = new ArrayList<String>();  
 
 - Advantages of ArrayList ☝
 1. Dynamic sizing - An ArrayList can grow in size as required. The programmer doesn't have to worry about the length of the ArrayList while adding elements to it.
@@ -554,6 +641,28 @@ IndexOutOfBound exception is thrown.
 
 - lambda expression can hide instance variable by redeclaring its own variable inside its {} block of code.
 
+-  var name = List.of("Dhruv", "Poonam", "Daksh", "Parth"); // is a valid syntax to declare a list.
+or var name = new ArrayList<String>(); // this is also valid statement
+
+- var list = new ArrayList<>(); // refers to an ArrayList of Object type, because Generic type is not defined on the right side.
+
+- If variable are declared in interface, it need to be initialized as variable in interface are implicitly public, static and final e.g
+interface MyInterface{
+int i;
+} // it will cause compilation error
+interface MyInterface{
+int i = 10;
+} // it will compilation fine
+
+- Reference variable to which lambda expression is assigned is known as target type. Target type can be a static variable, instance variable, local variable, method parameter or return type. 
+
+- Or you can typecast lambda expression to target type. e.g. following works:
+interface Operator<T> {
+    public abstract T operation(T t1, T t2);
+}
+System.out.println((Operator<String>)(String s1, String s2) -> s1 + s2);
+System.out.println((Operator<String>)(s1, s2) -> s1 + s2);
+System.out.println((Operator<String>)(s1, s2) -> { return s1 + s2; });
 
 
 

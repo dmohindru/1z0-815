@@ -46,7 +46,7 @@ Example - System.out.println("1234".concat("abcd")); //prints 1234abcd
 - String toLowerCase()/toUpperCase() - Converts all of the characters in this String to lower/upper case. 
 Example - System.out.println("ab".toUpperCase()); //prints AB
 
-- String replace(char oldChar, char newChar) - Returns a new string resulting from replacing all occurrences of oldChar in this string with newChar. Returns a string resulting from replacing all occurrences of oldChar in this string with newChar. If no replacement is done, then source String object is returned
+- String replace(char oldChar, char newChar) - Returns a new string resulting from replacing all occurrences of oldChar in this string with newChar. Returns a string resulting from replacing all occurrences of oldChar in this string with newChar. If no replacement is done, then source String object is returned. Instance method 'repeat()' has been added to String class in Java 11
 Example: System.out.println("ababa".replace('a', 'c')); //prints cbcbc
 it return same source object if not change are made to string object
 Example: "Java".replace('J', 'J'); // return same object
@@ -130,13 +130,27 @@ StringBuilder
 
 - public StringBuilder replace(int start,int end, String str) replaces StringBuilder object with str starting at start(inclusive) and ending at end(exclusive) and returns modified StringBuilder object. Throws StringIndexOutOfBoundsException - if start is negative, greater than length(), or greater than end.
 
-- public StringBuilder delete(int start,int end). Removes the characters in a substring of this sequence. The substring begins at the specified start and extends to the character at index end - 1 or to the end of the sequence if no such character exists. If start is equal to end, no changes are made. Throws StringIndexOutOfBoundsException - if start is negative, greater than length(), or greater than end.
+- public StringBuilder delete(int start,int end). Removes the characters in a substring of this sequence. The substring begins at the specified start and extends to the character at index end - 1 or to the end of the sequence if no such character exists. If start is equal to end, no changes are made. Throws StringIndexOutOfBoundsException - if start is negative, greater than length(), or greater than end. If end is greater than length of character it will not throw StringIndexOutOfBoundException, but end will set to length of StringBuilder object.
 
 - public StringBuilder deleteCharAt(int index). Removes the char at the specified position in this sequence. This sequence is shortened by one char. Throws StringIndexOutOfBoundsException - if the index is negative or greater than or equal to length().
+
+- public void setLength(int newLength)
+Sets the length of the character sequence. The sequence is changed to a new character sequence whose length is specified by the argument. For every nonnegative index k less than newLength, the character at index k in the new character sequence is the same as the character at index k in the old sequence if k is less than the length of the old character sequence; otherwise, it is the null character '\u0000'. In other words, if the newLength argument is less than the current length, the length is changed to the specified length.
+If the newLength argument is greater than or equal to the current length, sufficient null characters ('\u0000') are appended so that length becomes the newLength argument. Throws: IndexOutOfBoundsException - if the newLength argument is negative.
+
+The newLength argument must be greater than or equal to 0.
 
 - StringBuilder object will always maintain an addition buffer of 16 chars whenever a string is appended to the object. For eg
 StringBuilder sb = new StringBuilder(); // capacity is 16;
 StringBuilder sb = new StringBuilder("Dhruv"); // capacity is 21
+
+- StringBuilder does not override Object class equals method hence it only checks for referential equality. eg
+StringBuilder sb = new StringBuilder("Dhruv Mohindru");
+sb.equals(new StringBuilder("Dhruv Mohindru"); // it returns false;
+where as String override equals method of Object class and check equality on basis of referential and contents. eg
+String str = new String("Dhruv Mohindru);
+str.equals(new String("Dhruv Mohindru"); // return true
+str.equals(str); // returns true quite obvious ;-)
 
 - Methods that cannot be chained are 
 int capacity() 
@@ -174,6 +188,30 @@ Please note:
 If Array1 is null and Array2 is not null, then compare method returns -1.
 If Array2 is null and Array1 is not null, then compare method returns 1.
 If both Array1 and Array2 are null, then compare method returns 0.
+
+- various overloaded compare methods
+int compare​(boolean[] a, boolean[] b)
+int compare​(byte[] a, byte[] b)
+int compare​(short[] a, short[] b)
+int compare​(char[] a, char[] b)
+int compare​(int[] a, int[] b)
+int compare​(long[] a, long[] b)
+int compare​(float[] a, float[] b)
+int compare​(double[] a, double[] b)
+int compare​(T[] a, T[] b): Compares two Object arrays, with Comparable elements, lexicographically.
+int compare​(T[] a, T[] b, Comparator<? super T> cmp): Compares two Object arrays using a specified comparator.
+Please note: java.util.Arrays.compare(null, null);// causes compilation failure as it is an ambiguous call.
+
+- Arrays class has following overloaded equals methods for primitive type arrays:
+boolean equals​(boolean[] a, boolean[] b)
+boolean equals​(byte[] a, byte[] b)
+boolean equals​(short[] a, short[] b)
+boolean equals​(char[] a, char[] b)
+boolean equals​(int[] a, int[] b)
+boolean equals​(long[] a, long[] b)
+boolean equals​(float[] a, float[] b)
+boolean equals​(double[] a, double[] b)
+Above methods return true if both of the arrays are null or both contain the same elements in the same order, otherwise return false.
 
 - Array.equals(array) returns true if both array are equal false otherwise.
 
@@ -307,7 +345,7 @@ ArrayList(int initialCapacity): Constructs an empty list with the specified init
 
 - void clear(): Removes all of the elements from this list. 
 
-- E set(int index, E element): Replaces the element at the specified position in this list with the specified element. It returns the element that was replaced. 
+- E set(int index, E element): Replaces the element at the specified position in this list with the specified element. It returns the element that was replaced. Throws: IndexOutOfBoundsException - if the index is out of range (index < 0 || index >= size())
 
 - boolean contains(Object o): The object passed in the argument is compared with each element in the list using the equals method. A true is returned as soon as a matches is found, a false is returned otherwise. 
 

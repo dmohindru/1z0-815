@@ -105,6 +105,7 @@ String.join(".", List.of("A", "B", "C")); returns "A.B.C"
 
 String.join(".", List.of("HELLO")); returns "HELLO"
 
+- boolean contentEquals(CharSequence): Compares this string to the specified CharSequence. The result is true if and only if this String represents the same sequence of char values as the specified sequence. Note that if the CharSequence is a StringBuffer then the method synchronizes on it. 
 
 
 
@@ -116,7 +117,7 @@ StringBuilder
 3. StringBuilder(int capacity): Constructs a StringBuilder with no characters in it and an initial capacity specified by the capacity argument. If you expect to build a large string, you can specify a big capacity at the beginning to avoid reallocation of the internal storage array later.
 4. StringBuilder(String str): Constructs a StringBuilder initialized to the contents of the specified string. This constructor is actually redundant because of the StringBuilder(CharSequence seq) constructor. It exists only for backward compatibility with code written before JDK 1.4, which is when CharSequence was first introduced.
 
-- public StringBuilder append(). Appends the string representation of the argument to the sequence. Returns reference to the StringBuilder object.
+- public StringBuilder append(). Appends the string representation of the argument to the sequence. Returns reference to the StringBuilder object. append is an overloaded function with various parameters like char[], CharSequence, Object, String, StringBuffer and all primitive data types.
 
 - public StringBuilder insert(int offset, variousDataTypes b). Inserts the string representation of the argument into this sequence. Returns reference to the StringBuilder object. If offset > length or offset < 0 then StringIndexOutOfBoundException is thrown.
 

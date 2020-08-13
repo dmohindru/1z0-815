@@ -1,3 +1,7 @@
+Understanding Java Technology
+------------------------------
+- JDK 11 allow to create a class in default package (with missing package statement)
+
 Creating a Simple Java Program
 -------------------------------
 - It is possible to create multiple public class in one java file (single file program). But it must be executed by
@@ -28,11 +32,14 @@ java --source 11 Test.java . Instructs the java command to process the Test.java
 - order of public and static is interchangable e.g below are legal decleration for main method
 public static void main(String[] args);
 static public void main(String[] args);
+
+- If you pass a file name with .java extension to java command, then java command consider the passed file as 'single-file source-code program'. But if any other file name is passed, then it considers the passed file as the class name. So, in this case, if you run the command `java Util.txt 10 20`, then java command searches for the class with the name 'Util.txt' and would thrown an error. If the file does not have the .java extension, the --source option must be used to force source-file mode.
+`java --source 11 Util.txt 10 20` instructs the java command to process the Util.txt as Java 11 source code. 
  
 Working With Java Primitive Data Types and String APIs
 ------------------------------------------------------
-- long and int can be assigned to float and double with any casting.
-- substring(int start, int to): start is inclusive, to in exclusive
+- long and int can be assigned to float and double without any casting.
+- substring(int start, int to): start is inclusive, to is exclusive
 - cannot use local variable without initializing it.
 - toString method of StringBuilder class uses String constructor and does not use String literal. Hence when checked for
 referential equality with literal it will always be false
@@ -81,7 +88,7 @@ Whereas, Strings computed by concatenation at run time (if the resultant express
 (10 == num++) //Left side operand is evaluated first, value 10 is used in the expression and variable num is incremented by 1, so num=11
 (10 == 11) //Right side operand is evaluated next, value 11 is used in the expression and variable num is incremented by 1, so num = 12
 
-- var type cannot be used as method parameters or method return type.
+- var type cannot be used as method parameters or method return type. Local variable Type inference (var) is applicable only for local variables and not for instance or class variables. var cannot be used for lambda target type variable. 
 
 - Syntax of labels used in java loops
 one: for (var i = 0; i < 10; i++) {
@@ -99,7 +106,7 @@ if(price > 100000) {
 System.out.println(model); 
 only way initialization in if else block will succeed when there is sure shot initializing happening.
 
-- Please note that Strings computed by concatenation at compile time, will be referred by String Pool during execution. Compile time String concatenation happens when both of the operands are compile time constants, such as literal, final variable etc.
+- Please note that Strings computed by concatenation at compile time, will be referred by String Pool during execution. Compile time String concatenation happens when both of the operands are compile time constants, such as literal, final variable etc (variable have to be primitive type or String type, wrapper classes don't count in compile time constant).
 Whereas, Strings computed by concatenation at run time (if the resultant expression is not constant expression) are newly created and therefore distinct.
 
 - var a = (int)x + (int)y; //This is a valid java statement
@@ -113,7 +120,7 @@ num = 10; // compile time error
 - observe the following statement important
 int i = -2;
 i = -(--i); // will result in 3
-i = -(++i); // will result in 1
+i = -(++i); // will result in 1 can also be written as -++i
 
 - wrapper classes overrides equals method
 
@@ -126,6 +133,24 @@ System.out.println(i1 == i2); // prints true
 Integer i1 = Integer.valueOf(128);
 Ingeter i2 = 128;
 System.out.println(i1 == i2); // prints false
+
+- any number of underscore can come between digits, but not before or after number. e.g.
+int i = 1___2_3; // ok
+int i = ____1; // not ok as literal value but ok with variable name
+int i = 1____; // not ok
+
+- float i = 100.0; // fails to compile as compiler assume 100.0 as double so to compile it properly we need to do following adjustments
+float i = 100.0f; or float i = (float)100.0;
+System.out.println(i); //will print 100.0 by default and not 100.00 -- important remember
+
+- Below code will generate compilation error because of usage of uninitialized variable
+public class Test {
+    static String str = "KEEP IT "; //Line n1
+    public static void main(String[] args) {
+        String str = str + "SIMPLE"; //Line n2
+        System.out.println(str);
+    }
+}
 
 
 
@@ -142,12 +167,10 @@ Using Operators and Decision Constructs (12 questions) -- 67%
 - We can cast an object in a chain to its parent, grand parent and further with following syntax
 ((GreatGrandParentClass)(GrandParentClass)(ParentClass)childObject).childMemberOrMethod
 
-- . has a higher precedence than parenthesis so (ParentClass)childObject.stringVal will try to convert
-stringVal member variable to ParentClass with is not possible as ParentClass in not related to String class.
+- . has a higher precedence than parenthesis so (ParentClass)childObject.stringVal will try to convert stringVal member variable to ParentClass with is not possible as ParentClass in not related to String class.
 Hence compilation error is generated.
 
-- Array mismatch return first position where a miss match is found (0 based). So if position is 3, then mismatch
-method will return 3 - 1 = 2. mismatch return -1 if no mismatch is found and NullPointerException is thrown if either array is null.
+- Array mismatch return first position where a miss match is found (0 based). So if position is 3, then mismatch method will return 3 - 1 = 2. mismatch return -1 if no mismatch is found and NullPointerException is thrown if either array is null.
 
 - compare(x, y) return results as below
 char: x - y
@@ -157,16 +180,14 @@ int: -1 if x < y, 1 if x > y, 0 if x == y
 double: -1 if x < y, 1 if x > y, 0 if x == y
 boolean: 1 if x == true && y == false, -1 if x == false && y == true, 0 if x == y
 
-- String can point to null and use + operator to concatenate more string null objects. But cannot call methods
-on a null pointing string object.
+- String can point to null and use + operator to concatenate more string null objects. But cannot call methods on a null pointing string object.
 
 - if (expression1 && expression2 && expression3) . if expression1 evaluates to false, then expression2 and expression3
 are not evaluated.
 
 - with newer version of java switch statement can take String arguments as well
 
-- Local variable Type inference was added in JDK 10 (var variables). var in not a keyword, hence var can be used
-as variable name, method name, package name or loop label. But it cannot be used as class or interface name.
+- Local variable Type inference was added in JDK 10 (var variables). var in not a keyword, hence var can be used as variable name, method name, package name or loop label. But it cannot be used as class or interface name.
 
 - String.join api reference
 
@@ -192,7 +213,7 @@ So if val = 9, then above expression would return -10 and after evaluating this 
 
 - byte val = 127;
 val = val + 1; // result in int does not compile
-val = val = 1; // result in int does not compile
+val = val - 1; // result in int does not compile
 val++; // result val = (byte)(val + 1) compiles ok
 val--; // result val = (byte)(val - 1) compiles ok
 val *= 2; // result in val = (byte)(val*2); compile ok
@@ -202,7 +223,28 @@ val -= 10; // results in val = (byte)(val - 10); compiles ok
 
 - Binary plus (+) has got higher precedence than != operator.
 
-- switch can accept primitive types: byte, short, int, char; wrapper types: Byte, Short, Integer, Character; String and enums. In this case long and double are invalid values to be passed in switch expression. 
+- switch can accept primitive types: byte, short, int, char; wrapper types: Byte, Short, Integer, Character; String and enums. In this case long and double are invalid values to be passed in switch expression.
+
+- below code generates compile error as unreachable code
+  public static void main(String[] args) {
+  do {
+  System.out.print(100);
+  } while (true); //Line n1      
+  System.out.println(200); //Line n2
+  }
+  
+- char var = 7; // is a valid statement
+char var = 8; and char var = '8'; // var store two different values
+int ch = 'z'; // is a valid statement
+
+- Wrapper class are not related to each other and cannot be assigned to each other. e.g.
+Integer i = 10;
+Byte b = 10;
+i = b; // will cause compilation error
+where as below code will not cause any error
+int i = 10;
+byte b = 10;
+i = b;
 
 
 
@@ -270,7 +312,32 @@ longVar = intVar; // compatible type will compile without any issue.
 
 - cannot declare array as 
 var arr2 = {1, 2, 3}; // its compile time error
-var arr2 = new int[]{1, 2, 3};
+var arr2 = new int[]{1, 2, 3}; // this compiles fine
+
+int[] array = new int[4];
+array.toString(); // this would return string describe array something like this '[I@5674cd4d'
+
+- its is not possible to assign array on one primitive type to other primitive type, but is possible in class of reference type if one reference has is-a relation ship with each other. e.g.
+var intArray = new int[5];
+var shortArray = new short[3];
+intArray = shortArray; // will cause compilation error
+
+- There will be no compilation error if array is initialized with negative index e.g.
+int [][]arry = new int[-1][-2]  
+----
+var objArray = new Object[3];
+var strArray = new String[2];
+var sbArray = new StringBuilder[6];
+objArray = strArray; // will compile fine
+strArray = sbArray; // will not compile
+strArray = objArray; // will not compile
+
+- for Arrays.compare function
+String [] array1 = {"OCP", "11", null};
+String [] array2 = {"OCP", "11"};
+String [] array3 = {null, "OCP", "11"};
+
+array2 is a proper prefix of array1, but array2 is not a proper prefix of array3
 
 
 MAIN OBSERVATIONS
@@ -281,9 +348,11 @@ MAIN OBSERVATIONS
 Describing and Using Objects and Classes (1 question) -- 100%
 -------------------------------------------------------------
 - primitive type instance variables are initialized to their respective zeros and reference types to null
-(char: \u0000, byte: 0, short: 0, int: 0, float: 0.0, double: 0.0, boolean: false)
+(char: \u0000, byte: 0, short: 0, int: 0, float: 0.0, double: 0.0, boolean: false). And when char which points to \u0000 is printed it not print anything on console.
 
 - very important var cannot be used at class member variable.
+
+
 
 
 Creating and Using Methods (5 questions) -- 80%
@@ -329,8 +398,16 @@ void processData(Byte value){ }
 void processData(int... values){ }
 void processData(Integer value){ }  
 
+- Please note that there is no rule regarding return type for overloaded methods, return type can be same or different.
 
+- for given overloaded method
+int calculate(int i1, int i2) { return i1 + i2;}
+double calculate(byte b1, byte b2) { return b1 % b2; }
+int i = 9;
+byte b = 100;
+calculate(b, i); // this call will tag to calculate(int, int) as byte is implicitly casted to int type.
 
+- its legal but not a prefered way to access static variable of class through this keyword.
 
 
 
@@ -384,6 +461,9 @@ way round super class in not an instance of child class.
 - If Super class reference variable points to sub class object. Then this variable will point to super class member
 variable and sub class member methods.
 
+- If an interface reference variable points to sub class object (Which implements this interface). Then this variable will point to interface static member
+variable and sub class member methods.
+
 - rules related to return types of overriding methods
 A. If return type of overridden method is of primitive type, then overriding method should use same primitive type.
 B. If return type of overridden method is of reference type, then overriding method can use same reference type or
@@ -402,18 +482,15 @@ ParentClass parentClass = new ParentClass() {
     // child class code
     };
 
-- Static methods in Java are inherited, but can not be overridden. If you declare the same method in a subclass,
-you hide the superclass method instead of overriding it. Static methods are not polymorphic. At the compile time,
-the static method will be statically linked.
+- Static methods in Java are inherited, but can not be overridden. If you declare the same method in a subclass, you hide the superclass method instead of overriding it. Static methods are not polymorphic. At the compile time, the static method will be statically linked.
 
-- If a super class variable points to subclass variable then it is legal to cast super class variable to sub class variable, although it is redundant.
+- If a super class reference variable points to subclass object then it is legal to cast super class variable to sub class variable, although it is redundant.
 eg. X --> Y --> Z
 X x = new Z();
 (Y)x; // legal and will compile even though its redundant
 (Z)x; // legal and will compile even though its redundant
 
-- ClassCastException is thrown if two super class variable point to sibling child classes if one sibling object is converted to other sibling object using a
-super class variable then ClassCastException is thrown.
+- ClassCastException is thrown if two super class reference variable point to sibling child classes if one sibling object is converted to other sibling object using a super class variable then ClassCastException is thrown.
 eg. A-->B, A-->C
 A a1 = new B();
 A a2 = new C();
@@ -449,7 +526,7 @@ StringBuilder sb = (StringBuilder) new String("Hello World!); // will not compil
 
 - You need casting when you want to use the features (i.e. instance variables and methods) defined in a subclass using a reference whose declared type is of a superclass.
 
--  static methods, static variables, and instance variables are accessed as per the declared type of the variable through which they are accessed and not according to the actual type of the object to which the variable refers. 
+-  static methods, static variables, and instance variables are accessed as per the declared type of the variable through which they are accessed and not according to the actual type of the object to which the variable refers. Same rule applies for interface variables also.
 
 - There are different ways in which static method of an abstract class can be accessed:
 (Abstract class) A --> MyClass
@@ -464,7 +541,7 @@ StringBuilder sb = (StringBuilder) new String("Hello World!); // will not compil
 
 - Child class can extend a concrete class and still be declared abstract.
 
-- Even if instance variable initalizers are present in class, instance variable will only be initalized after a call to super method is executed. (Test 4 - Ques 22).  
+- Even if instance variable initializers are present in class, instance variable will only be initalized after a call to super method is executed. (Test 4 - Ques 22).  
 
 - Any super class reference variable can be casted to sub class reference variable no compilation error. But if super class reference variable points to super class object then it will cause ClassCastException, if super class reference point to null or sub class object then it will not throw any exception.
 e.g. Base --> Sub
@@ -478,10 +555,16 @@ Sub s = (Sub)b; // will compile fine and will not throw any exception at run tim
 
 - casting of super or this keyword in not allowed 
 
+- Assignment like Object num = 10; will autobox 10 to Integer type as assign it to num reference variable.
+
+- If super class reference variable is used to point to sub class object. Then through super class variable only those member function can be invoked which are defined in super class. 
+
+- Constructors cannot use final, abstract or static modifiers. 
+
 
 Programming Abstractly Through Interfaces (18 questions) -- 56%
 ---------------------------------------------------------------
-- Interface abstract methods are always public and implicitly method. You don't have to specify abstract keyword.
+- Interface methods are always public and abstract implicitly method. You don't have to specify abstract keyword.
 
 - Interface fields cannot be protected or private. All variables defined in an interface are implicitly public, static, and final. 
 
@@ -499,9 +582,7 @@ Programming Abstractly Through Interfaces (18 questions) -- 56%
 
 - Since methods of an interface are meant to be implemented by the classes that implement the interface, methods of an interface cannot be declared final.
 
-- methods in interface are by default abstract and abstract method cannot have a body. If we need to provide a
-method with implementation, we need to declare that method with default or private keyword and
-provide an implementation.
+- methods in interface are by default abstract and abstract method cannot have a body. If we need to provide a method with implementation, we need to declare that method with default or private keyword and provide an implementation.
 
 - Syntax of class implementing multiple interfaces as class MyClass implements Interface1, Interface2 {}
 
@@ -525,7 +606,7 @@ multiple interface: Interface Interface3 extends Interface1, Interface2, OtherIn
   
 - Inheriting interface can provide implementation of abstract methods inherited from its super interface.
 
-- To use local variables in interface a variable should be final or effectively final, else compilation error will occur.
+- To use local variables in functional interface implementation a variable should be final or effectively final, else compilation error will occur.
 
 - Since, due to type erasure, generic information is removed at run time, it follows that generic information cannot be a part of the signature. Thus, two methods that differ only in their type parameters are not valid overloads.
 
@@ -580,58 +661,39 @@ Similarities between ArrayLists and arrays ☝
 4. Performance - Since an ArrayList is backed by an array internally, there is no difference in performance of various operations such as searching on an ArrayList and on an array.
 5. Thread safety - Neither of them are thread safe. Don't worry, thread safety is not on the exam, but you should be aware of the fact that accessing either of them from multiple threads, may produce incorrect results in certain situations.
  
-- Arrays.asList method returns a fixed-size list backed by the specified array and as list is backed by the specified
-array therefore, you cannot add or remove elements from this list. Using add/remove methods cause an
-exception at runtime. But you can invoke the set(int index, E element) method on the returned list.
+- Arrays.asList method returns a fixed-size list backed by the specified array and as list is backed by the specified array therefore, you cannot add or remove elements from this list. Using add/remove methods cause an exception at runtime. But you can invoke the set(int index, E element) method on the returned list.
 
-- List.of method, which returns unmodifiable list, hence calling add/remove/set methods on the unmodifiable list throws
-an exception at runtime
+- List.of and List.copyOf method, which returns unmodifiable list, hence calling add/remove/set methods on the unmodifiable list throws an exception at runtime
 
-- Iterable<T> interface has forEach(Consumer) method.  List<E> extends Collection<E> &
-Collection<E> extends Iterable<E>, therefore forEach(Consumer) can easily be invoked on reference variable of
-List<E> type.
+- Iterable<T> interface has forEach(Consumer) method.  List<E> extends Collection<E> & Collection<E> extends Iterable<E>, therefore forEach(Consumer) can easily be invoked on reference variable of List<E> type.
 
-- forEach(Consumer) method performs the given action for each element of the Iterable until all elements have been
-processed or the action throws an exception. Consumer is a functional interface, hence a lambda expression can be
-passed.
+- forEach(Consumer) method performs the given action for each element of the Iterable until all elements have been processed or the action throws an exception. Consumer is a functional interface, hence a lambda expression can be passed.
 
 - abstract class in java can have 0 or more abstract methods
 
-
-
--clone method of list interface create a shallow copy of list object. Means if an original list contains reference
-variables then after clone method a new list object is created which contains same reference objects as original
-object.
+-clone method of list interface create a shallow copy of list object. Means if an original list contains reference variables then after clone method a new list object is created which contains same reference objects as original object.
 
 - All wrapper classes Integer, Float, Double, Character, Byte, Short, Boolean are immutable classes like a String class.
 
-- If lambda expression is in {}, then it should have complete expression including semicolons and return statement if
-required.
+- If lambda expression is in {}, then it should have complete expression including semicolons and return statement if required.
 
 - While implementing an interface method, this method should not have weaker access modifier than declared in interface.
 Interface methods are public implicitly, so class which implements interface should also declare methods as public.
 
-- Study ques40 for a very peculiar example of sub class implementing interface and extending base class which does not
-implements any interface but has a same method implemented as its member method (Test 2).
+- Study ques40 for a very peculiar example of sub class implementing interface and extending base class which does not implements any interface but has a same method implemented as its member method (Test 2). If a sub class inherits method with same signature from both super and interface, then sub class will inherit super class version methods, but if super class has a weaker access modifier (not being public) than interface method, then it will cause a compilation error. To resolve this error either sub class should override that method with a public access modifier or super class method should be declared public. 
 
-- Functional Interface can have only one non-overriding abstract method. Apart from it a functional interface can have
-constant variables, default methods, private methods, overriding abstract methods like public String toString(), public boolean equals(Object)
-and public int hashCode().
+- Functional Interface can have only one non-overriding abstract method. Apart from it a functional interface can have constant variables, default methods, private methods, overriding abstract methods like public String toString(), public boolean equals(Object) and public int hashCode().
 
-- While traversing a list using an iterator, if it is required to remove item from list use Iterator.remove or
-ListIterator.remove method, rather than List.remove method. As later method will throw
-java.util.ConcurrentModificationException.
+- While traversing a list using an iterator, if it is required to remove item from list use Iterator.remove or ListIterator.remove method, rather than List.remove method. As later method will throw java.util.ConcurrentModificationException.
 
-- Variables defined in interface are implicitly public final static. Correct way of access interface variable is with
-syntax InterfaceName.variableName. But reference type can also point to interface variables.
+- Variables defined in interface are implicitly public final static. Correct way of access interface variable is with syntax InterfaceName.variableName. But reference type can also point to interface variables.
 
 - remove(Object o) method of list return true if object was removed successfully or false otherwise.
 
 - remove(int index) remove the element of list at index and returns that element.
 
 - add(E e) method of list return true if object was added successfully or false otherwise.
-- add(int index, E element) inserts element at index. It returns void. if index is < 0 or > list length, then
-IndexOutOfBound exception is thrown.
+- add(int index, E element) inserts element at index. It returns void. if index is < 0 or > list length, then IndexOutOfBound exception is thrown.
 
 - But note, java.util.ConcurrentModificationException will never be thrown for traditional for loop. It is thrown for for-each loop or while using Iterator/ListIterator.
 
@@ -664,6 +726,8 @@ System.out.println((Operator<String>)(String s1, String s2) -> s1 + s2);
 System.out.println((Operator<String>)(s1, s2) -> s1 + s2);
 System.out.println((Operator<String>)(s1, s2) -> { return s1 + s2; });
 
+- If you want to invoke the default method implementation from the overriding method, then the correct syntax is: [Interface_name].super.[default_method_name]
+
 
 
 MAIN OBSERVATIONS
@@ -687,23 +751,17 @@ Handling Exceptions (8 questions) -- 63%
 - Note that curly braces for the try, catch, and finally blocks are required even if there is a single statement in these blocks  (compare that to if, while, do/while and for blocks where curly braces are not required if there is only one statement in the block).  Furthermore, a try block must follow with at least one catch block or the finally block. A try block that follows with neither a catch block nor a finally block will not compile. 
  
 
-- In exception handling order in which catch block is specified matter. if subclass exception is specified after super
-class exception, then it will be a compile error, compiler will state is as unreachable code.
+- In exception handling order in which catch block is specified matter. if subclass exception is specified after super class exception, then it will be a compile error, compiler will state is as unreachable code.
 
 - RuntimeException can be thrown without any need to be declared in throws clause of surrounding method.
-throw (RuntimeException)e; doesn't cause any compilation error. Even though variable 'e' is type casted to
-RuntimeException but exception object is still of ArithmeticException, which is caught in main method and
-'AE' is printed to the console. (Ques 6)
+throw (RuntimeException)e; doesn't cause any compilation error. Even though variable 'e' is type casted to RuntimeException but exception object is still of ArithmeticException, which is caught in main method and 'AE' is printed to the console. (Ques 6)
 
 - Java doesn't allow to catch specific checked exceptions if these are not thrown by the statements inside try block.<--- Verified
 
 - If an instance of Exception is thrown by the catch-block but another catch-block at the same level are not executed.
-Explaining this point further, in a try catch block with multiple catch blocks only one of the catch block is executed
-even though an executed catch block throws new other type of exception. And as usual finally block is always executed.
+Explaining this point further, in a try catch block with multiple catch blocks only one of the catch block is executed even though an executed catch block throws new other type of exception. And as usual finally block is always executed.
 
-- If a method has a throws clause and it throws unchecked exception then calling method don't need to handle that
-exception. But if method throws checked exception then calling method needs to handle that exception by either
-try/catch block or add throws clause to method signature.
+- If a method has a throws clause and it throws unchecked exception then calling method don't need to handle that exception. But if method throws checked exception then calling method needs to handle that exception by either try/catch block or add throws clause to method signature.
 
 - Casting Super class Exceptions like RuntimeException to sub class exception like ArithmeticException will cause ClassCastException to be thrown.
 
@@ -727,9 +785,11 @@ try/catch block or add throws clause to method signature.
 5. Cannot declare to throw unrelated checked exception.
 6. May declare to throw any RuntimeException or Error.
 
+- Only thing to remember is that if overridden method throws any unchecked exception or Error, then overriding method must not throw any checked exceptions.
+
 - Java follows a convention in naming exception classes. This convention is sometimes helpful in determining the kind of exception you are dealing with. The name of any class that extends Error ends with Error and the name of any class than extends Exception ends with Exception. For example, OutOfMemoryError and StackOverflowError are Errors while IOException, SecurityException, IndexOutOfBoundsException are Exceptions. However, there is no way to distinguish between unchecked exceptions that extend RuntimeException and checked exceptions just by looking at their names. It is therefore, important to memorize the names of a few important runtime exception classes, namely - NullPointerException, ArrayIndexOutOfBoundsException, ArithmeticException, ClassCastException, and SecurityException.
 
-- It is ok to catch an exception with wider class in catch block and rethown it. But if a exception variable is reassigned in catch block it will cause compilation error. e.g.
+- It is ok to catch an exception with wider class in catch block and rethown it. But if a exception variable is reassigned in catch block it will cause compilation error. e.g. -- work on it
 private static void getData() throws SQLException {
         try {
             throw new SQLException();
@@ -859,7 +919,7 @@ e.g TestClass() throws Exception{}
 
 - Unreachable catch blocks. What if you move the catch(IOException ioe) block before the catch(FileNotFoundException fnfe) block? Well, the code will fail to compile. The catch(IOException ioe) clause will always satisfy a FileNotFoundException and so the control will never get to enter catch(FileNotFoundException fnfe) block.
 
-- But remember that a catch block associated with a nested try statement is cannot catch an exception thrown by the outer try block. 
+- But remember that a catch block associated with a nested try statement cannot catch an exception thrown by the outer try block. 
 
 - It is possible to rethrow the same exception (or throw a new one) from the catch block. You may want to do this if you want to do something upon receiving an exception before letting it propagate up the call chain. Of course, if it is a checked exception you would have to declare it in the throws clause of the method. The same effect can be achieved with a finally block. 
 
@@ -913,9 +973,7 @@ java -p <module_path> -m <module>[/<mainclass>] [args...]
  -p option can also be provided as --module-path
  -m option can also be provided as --module
 module_path(s) are separated by ; on windows and : on linux/mac
-if each different module paths contain same module in them then first module path containing the requested module
-is executed and other module paths are ignored. (see question 12). -m option should be the last option as it could
-contain command line options.
+if each different module paths contain same module in them then first module path containing the requested module is executed and other module paths are ignored. (see question 12). -m option should be the last option as it could contain command line options.
 
 - Note that the requirement of having the module-info.class in the root folder of the jar implies that it is not possible to package multiple modules in the same jar. In other words, you can have only one module per jar.
 
@@ -933,7 +991,7 @@ contain command line options.
  requires transitive
 a module cannot export standard module of java platform e.g. java.se
 
-- Wild-card (*) is not allowed with the package names
+- While exporting a package Wild-card (*) is not allowed with the package names
 
 - requires or requires transitive directive should have module name and not package name in their declaration. 
 
@@ -968,6 +1026,10 @@ unnamed package is not allowed in named modules (see question 35)
 - In module-info.java name of module should be same as its root directory
 
 - Java Platform Module System was introduced in Java 9 as project jigsaw
+
+- When multiple modules with the same name are in different jar files on the module path, first module is selected and rest of the modules with same name are ignored. As first modular jar file in module path is 'secret_two.jar', hence com.udayankhattry.ocp1.Secret class defined in secret_two.jar file executes, which prints DEFEND on to the console.
+
+- If a module exports a package to a missing module, then code will compile but will generate a warning about missing module.
 
 - If a module have two packages e.g
 dev.dmohindru.example;
@@ -1081,6 +1143,15 @@ Modular JDK is an effort to solve this problem. It divided the JDK into several 
 3. It improves application performance by not requiring unnecessary classes to be packaged and/or loaded.
 4. It is backward compatible. It is not required for an application to be structured as modular to be run on the modular JDK. A non-modular application will still run just like before on the modular JDK using the -classpath option.
 5. Customization is possible. It is possible to make the packages that are not exported explicitly in the module descriptor accessible through the use of appropriate command line options. For example, if a module does not export a package, you can still use the --add-exports option to make it accessible to other modules. Of course, this option breaks the encapsulation mechanism and is undesirable. It should be used only in exceptional circumstances.
+
+- To have `import java.sql.*;` in the module-info.java file, `requires java.sql;` directive is needed, hence below is invalid code in module-info.java.
+File name: module-info.java
+import java.sql.*;
+module com.data.sort {
+    requires java.sql;
+}
+
+- In the module descriptor file, if package specified in the exports directive is empty or doesn't exist, then compiler complains about it.
 
 
 Current read

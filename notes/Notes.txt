@@ -138,6 +138,12 @@ System.out.println(i1 == i2); // prints false
 int i = 1___2_3; // ok
 int i = ____1; // not ok as literal value but ok with variable name
 int i = 1____; // not ok
+_ cannot be around decimal point or after number and before f literal
+float f = 12_3.0_1f; // ok
+float f = 1230_.01f; // not ok
+float f = 1230._01f; // not ok
+float f = _1230.01f; // not ok
+float f = 1230.01_f; // not ok
 
 - float i = 100.0; // fails to compile as compiler assume 100.0 as double so to compile it properly we need to do following adjustments
 float i = 100.0f; or float i = (float)100.0;
@@ -151,6 +157,13 @@ public class Test {
         System.out.println(str);
     }
 }
+
+- underscore '_' can be used to increase readability by we cannot use _ for following situtations
+Beginning and end of number
+Adjacent to a decimal point in floating-point literal
+prior to suffix
+
+- Strings computed by concatenation at compile time, will be referred by String Pool during execution. Compile time String concatenation happens when both of the operands are compile time constants, such as literal, final variable of primitive type or String type.
 
 
 
@@ -245,6 +258,10 @@ where as below code will not cause any error
 int i = 10;
 byte b = 10;
 i = b;
+
+- ! has higher precidence than && operator and && operator has higher precidence than || operator.
+
+- assignment operator += *= -= /= has least precedence. 
 
 
 
@@ -459,7 +476,7 @@ access modifier variable can be access via inheritance as well as through object
 way round super class in not an instance of child class.
 
 - If Super class reference variable points to sub class object. Then this variable will point to super class member
-variable and sub class member methods.
+variable and sub class non-static member methods.
 
 - If an interface reference variable points to sub class object (Which implements this interface). Then this variable will point to interface static member
 variable and sub class member methods.
@@ -494,7 +511,7 @@ X x = new Z();
 eg. A-->B, A-->C
 A a1 = new B();
 A a2 = new C();
-C c1 = (A)a1; // will compile fine but will throw ClassCastException.
+C c1 = (C)a1; // will compile fine but will throw ClassCastException.
 
 - private or protected modifier cannot be used at class level
 
@@ -593,8 +610,8 @@ Programming Abstractly Through Interfaces (18 questions) -- 56%
 - In Interfaces Java allows a class to inherit multiple fields from interface(s) with the same name as long as you don't try to use those fields ambiguously. To remove ambiguity use fields with their Interface name. e.g. Interface1.myVar and Interface2.myVar
 
 - Syntax for interface to extend interface
-single interface: Interface Interface2 extends Interface1 {}
-multiple interface: Interface Interface3 extends Interface1, Interface2, OtherInterface {}
+single interface: interface Interface2 extends Interface1 {}
+multiple interface: interface Interface3 extends Interface1, Interface2, OtherInterface {}
 
 - Remember that a class cannot extend an interface, it can only implement an interface. Whereas, an interface cannot implement any interface it can only extend an interface. 
 
@@ -1152,6 +1169,8 @@ module com.data.sort {
 }
 
 - In the module descriptor file, if package specified in the exports directive is empty or doesn't exist, then compiler complains about it.
+
+- If question specifies a modular jar and does not state its main class attributes, then assume that its main class attribute is not set and hence when executing that modular jar complete path of its main class should be specified on command line.
 
 
 Current read

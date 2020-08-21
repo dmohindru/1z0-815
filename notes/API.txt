@@ -46,16 +46,19 @@ Example - System.out.println("1234".concat("abcd")); //prints 1234abcd
 - String toLowerCase()/toUpperCase() - Converts all of the characters in this String to lower/upper case. 
 Example - System.out.println("ab".toUpperCase()); //prints AB
 
-- String replace(char oldChar, char newChar) - Returns a new string resulting from replacing all occurrences of oldChar in this string with newChar. Returns a string resulting from replacing all occurrences of oldChar in this string with newChar. If no replacement is done, then source String object is returned. Instance method 'repeat()' has been added to String class in Java 11
+- String replace(char oldChar, char newChar) - Returns a new string resulting from replacing all occurrences of oldChar in this string with newChar. Returns a string resulting from replacing all occurrences of oldChar in this string with newChar. If no replacement is done, then source String object is returned. 
 Example: System.out.println("ababa".replace('a', 'c')); //prints cbcbc
 it return same source object if not change are made to string object
 Example: "Java".replace('J', 'J'); // return same object
+
+
 
 - public String replace(CharSequence target, CharSequence replacement) {}:
 Returns a new String object after replacing each substring of this string that matches the literal target sequence with the specified literal replacement sequence. e.g.
 "Java".replace("a", "A") --> returns new String object "JAvA".
 "Java".replace("a", "a") --> returns new String object "Java" (it replaces "a" with "a").
 "Java".replace("m", "M") --> returns the source String object "Java" (no change).
+
 
 - String strip(), stripLeading(), stripTrailing(), trim() - Returns a copy of the string, with leading and/or trailing white space omitted.
 Example:
@@ -81,7 +84,9 @@ System.out.println(" 123 ".trim()); //prints "123" (without the quotes)
 - public String repeat​(int count) Returns a string whose value is the concatenation of this string repeated count times. If this string is empty or count is zero then the empty string is returned. Throws IllegalArgumentException - if the count is negative. e.g.
  "*".repeat(5); // would return *****
  "*".repeat(1); // would return *
+ this method is available since java 11.
 
+- Instance method 'repeat()' has been added to String class in Java 11
 
 - public static String join(CharSequence delimiter, CharSequence... elements) {...}: It returns a new String composed of copies of the CharSequence elements joined together with a copy of the specified delimiter.
 For example,
@@ -166,8 +171,7 @@ String toString()
 
 Array in Java
 -------------
-- Array.mismatch(array1, array2) return zero based index of arrays where mismatch is found. mismatch function is
-overloaded and it takes primitive data types only. boolean, char, byte, short, int, float, double. If no mismatch is found -1 is returned. It throws NullPointerException, if either array is null.
+- Array.mismatch(array1, array2) return zero based index of arrays where mismatch is found. mismatch function is overloaded and it takes primitive data types only. boolean, char, byte, short, int, float, double. If no mismatch is found -1 is returned. It throws NullPointerException, if either array is null.
 
 - There are other overloaded mismatch methods for primitive types with ranges:
 
@@ -228,6 +232,8 @@ a - the array by which the list will be backed
 Returns:
 a list view of the specified array
 
+- Array.fill(arrayObject, fillObject) fills all element in arrayObject with fillObject.
+
 
 Collection
 ----------
@@ -262,7 +268,7 @@ List Interface
 
 - boolean addAll(Collection<? extends E> c): Adds all the elements of the given collection to this list at the end. Returns true if this list changed as a result of the call.
 
-- void addAll(int index, Collection<? extends E> c): Adds all the elements of the given collection at the given index. Returns true if this list changed as a result of the call. index should be > 0 and <= size, else IndexOutOfBoundException is thrown.
+- boolean addAll(int index, Collection<? extends E> c): Adds all the elements of the given collection at the given index. Returns true if this list changed as a result of the call. index should be > 0 and <= size, else IndexOutOfBoundException is thrown.
 
 - E remove(int index): Removes an object from the specified index and shifts the existing elements at a higher index to the left. It returns the original element that was removed from the list. index should be > 0 and < size, else IndexOutOfBoundException is thrown.
 
@@ -302,7 +308,7 @@ Methods that help you inspect a list:
 
 - boolean remove(Object o) method of list return true if object was removed successfully or false otherwise.
 
-- The overloaded 'of' methods are merely convenience methods that take 0 to 10 parameters and return an unmodifiable List. For example, if you want to create a list of 3 Strings, you could do List<String> list1 = List.of("a", "b", "c");
+- The overloaded 'of' methods are merely convenience methods that take 0 to 10 parameters and return an unmodifiable List. For example, if you want to create a list of 3 Strings, you could do List<String> list1 = List.of("a", "b", "c"); 
 
 - copyOf method is a convenience method to create an unmodifiable list using the elements of an existing collection. For example, List<String> list2 = List.copyOf(list1);
 
